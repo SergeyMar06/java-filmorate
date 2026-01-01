@@ -42,9 +42,13 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new InvalidFormatException("Название не может быть пустым!");
         }
 
-        if (film.getDescription().length() > 200) {
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
             log.warn("Попытка создать фильм с превышенной длиной описания");
             throw new InvalidFormatException("Превышена максимальная длина описания - 200");
+        }
+
+        if (film.getReleaseDate() == null) {
+            throw new InvalidFormatException("Дата релиза не может быть пустой!");
         }
 
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
@@ -80,9 +84,13 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new InvalidFormatException("Название не может быть пустым!");
         }
 
-        if (newFilm.getDescription().length() > 200) {
+        if (newFilm.getDescription() != null && newFilm.getDescription().length() > 200) {
             log.warn("Попытка создать фильм с превышенной длиной описания");
             throw new InvalidFormatException("Превышена максимальная длина описания - 200");
+        }
+
+        if (newFilm.getReleaseDate() == null) {
+            throw new InvalidFormatException("Дата релиза не может быть пустой!");
         }
 
         if (newFilm.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
@@ -96,6 +104,10 @@ public class InMemoryFilmStorage implements FilmStorage {
         }
 
         Film oldFilm = films.get(newFilm.getId());
+
+        if (oldFilm == null) {
+            throw new NotFoundException("Фильм с id = " + newFilm.getId() + " не найден");
+        }
 
         if (newFilm.getDescription() != null) {
             oldFilm.setDescription(newFilm.getDescription());

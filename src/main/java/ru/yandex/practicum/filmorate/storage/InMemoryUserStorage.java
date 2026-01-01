@@ -43,7 +43,7 @@ public class InMemoryUserStorage implements UserStorage {
             throw new InvalidFormatException("Login не может быть пустым и содержать пробелы!");
         }
 
-        if (user.getBirthday().isAfter(LocalDate.now())) {
+        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
             log.warn("Попытка создать пользователя с датой рождения в будущем");
             throw new InvalidFormatException("Дата рождения не может быть в будущем!");
         }
@@ -79,13 +79,17 @@ public class InMemoryUserStorage implements UserStorage {
             throw new InvalidFormatException("Login не может быть пустым и содержать пробелы!");
         }
 
-        if (newUser.getBirthday().isAfter(LocalDate.now())) {
+        if (newUser.getBirthday() != null && newUser.getBirthday().isAfter(LocalDate.now())) {
             log.warn("Попытка создать пользователя с датой рождения в будущем");
             throw new InvalidFormatException("Дата рождения не может быть в будущем!");
         }
 
         if (users.containsKey(newUser.getId())) {
             User oldUser = users.get(newUser.getId());
+
+            if (oldUser == null) {
+                throw new NotFoundException("Фильм с id = " + oldUser.getId() + " не найден");
+            }
 
             if (newUser.getName() != null) {
                 oldUser.setName(newUser.getName());
