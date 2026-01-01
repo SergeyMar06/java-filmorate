@@ -56,7 +56,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             throw new InvalidFormatException("Дата релиза не должна быть раньше 28 декабря 1895 года!");
         }
 
-        if (film.getDuration() < 0) {
+        if (film.getDuration() != null && film.getDuration() < 0) {
             log.warn("Попытка создать фильм с отрицательной продолжительностью");
             throw new InvalidFormatException("Продолжительность фильма не может быть отрицательным числом!");
         }
@@ -115,7 +115,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (newFilm.getName() != null) {
             oldFilm.setName(newFilm.getName());
         }
-        if (newFilm.getDuration() != 0) {
+        if (newFilm.getDuration() != null && newFilm.getDuration() >= 0) {
             oldFilm.setDuration(newFilm.getDuration());
         }
         if (newFilm.getReleaseDate() != null) {
@@ -157,10 +157,14 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     public Set<Film> getFilmWithTheMostLikes(Long count) {
         return films.values().stream()
-                .sorted((f1, f2) -> Integer.compare(f2.getUsersLikesFilm().size(), f1.getUsersLikesFilm().size()))
+                .sorted((f1, f2) -> Integer.compare(
+                        f2.getUsersLikesFilm() != null ? f2.getUsersLikesFilm().size() : 0,
+                        f1.getUsersLikesFilm() != null ? f1.getUsersLikesFilm().size() : 0
+                ))
                 .limit(count != null ? count : 10)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
+
 
 
     private long getNextId() {

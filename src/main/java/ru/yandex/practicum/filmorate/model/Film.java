@@ -14,6 +14,6 @@ public class Film {
     private String name;
     private String description;
     private LocalDate releaseDate;
-    private double duration;
+    private Double duration;
     private Set<Long> usersLikesFilm;
 }

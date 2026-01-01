@@ -56,7 +56,7 @@ public class InMemoryUserStorage implements UserStorage {
 
         users.put(user.getId(), user);
 
-        log.warn("Пользователь успешно создан с id {}", user.getId());
+        log.info("Пользователь успешно создан с id {}", user.getId());
 
         return user;
     }
@@ -88,7 +88,7 @@ public class InMemoryUserStorage implements UserStorage {
             User oldUser = users.get(newUser.getId());
 
             if (oldUser == null) {
-                throw new NotFoundException("Фильм с id = " + oldUser.getId() + " не найден");
+                throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
             }
 
             if (newUser.getName() != null) {
