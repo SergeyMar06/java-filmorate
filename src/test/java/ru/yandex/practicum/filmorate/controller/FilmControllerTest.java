@@ -4,8 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,7 +19,7 @@ class FilmControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new FilmController();
+        controller = new FilmController(new FilmService(new InMemoryFilmStorage()));
     }
 
     @Test
@@ -25,12 +28,17 @@ class FilmControllerTest {
         film.setName("Интерстеллар");
         film.setDescription("Фильм о космосе");
         film.setReleaseDate(LocalDate.of(2014, 11, 7));
-        film.setDuration(169);
+        film.setDuration(169.0); // <-- Double
 
-        Film created = controller.create(film);
+        controller.create(film);
 
+        Collection<Film> allFilms = controller.findAll();
+        assertThat(allFilms).hasSize(1);
+
+        Film created = allFilms.iterator().next();
         assertThat(created.getId()).isPositive();
-        assertThat(controller.findAll()).contains(created);
+        assertThat(created.getName()).isEqualTo(film.getName());
+        assertThat(created.getDescription()).isEqualTo(film.getDescription());
     }
 
     @Test
@@ -39,7 +47,7 @@ class FilmControllerTest {
         film.setName("");
         film.setDescription("Описание");
         film.setReleaseDate(LocalDate.of(2020, 1, 1));
-        film.setDuration(120);
+        film.setDuration(120.0); // <-- Double
 
         assertThatThrownBy(() -> controller.create(film))
                 .isInstanceOf(InvalidFormatException.class)
@@ -50,9 +58,9 @@ class FilmControllerTest {
     void shouldThrowWhenDescriptionTooLong() {
         Film film = new Film();
         film.setName("Название");
-        film.setDescription("x".repeat(201)); // > 200 символов
+        film.setDescription("x".repeat(201));
         film.setReleaseDate(LocalDate.of(2020, 1, 1));
-        film.setDuration(100);
+        film.setDuration(100.0); // <-- Double
 
         assertThatThrownBy(() -> controller.create(film))
                 .isInstanceOf(InvalidFormatException.class)
@@ -65,7 +73,7 @@ class FilmControllerTest {
         film.setName("Название");
         film.setDescription("Описание");
         film.setReleaseDate(LocalDate.of(1800, 1, 1));
-        film.setDuration(90);
+        film.setDuration(90.0); // <-- Double
 
         assertThatThrownBy(() -> controller.create(film))
                 .isInstanceOf(InvalidFormatException.class)
@@ -78,7 +86,7 @@ class FilmControllerTest {
         film.setName("Название");
         film.setDescription("Описание");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(-50);
+        film.setDuration(-50.0); // <-- Double
 
         assertThatThrownBy(() -> controller.create(film))
                 .isInstanceOf(InvalidFormatException.class)

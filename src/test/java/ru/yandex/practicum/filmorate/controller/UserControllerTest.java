@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,7 +20,7 @@ class UserControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new UserController();
+        controller = new UserController(new UserService(new InMemoryUserStorage()));
     }
 
     @Test
@@ -28,11 +31,17 @@ class UserControllerTest {
         user.setName("Сергей");
         user.setBirthday(LocalDate.of(1990, 5, 20));
 
-        User created = controller.create(user);
+        // создаём пользователя (create() void)
+        controller.create(user);
 
+        // достаём созданного пользователя через findAll()
+        Collection<User> allUsers = controller.findAll();
+        assertThat(allUsers).hasSize(1);
+
+        User created = allUsers.iterator().next();
         assertThat(created.getId()).isPositive();
-        assertThat(controller.findAll()).contains(created);
         assertThat(created.getName()).isEqualTo("Сергей");
+        assertThat(created.getEmail()).isEqualTo("user@example.com");
     }
 
     @Test
@@ -43,7 +52,10 @@ class UserControllerTest {
         user.setBirthday(LocalDate.of(1990, 5, 20));
         user.setName(null);
 
-        User created = controller.create(user);
+        controller.create(user);
+
+        Collection<User> allUsers = controller.findAll();
+        User created = allUsers.iterator().next();
 
         assertThat(created.getName()).isEqualTo("user123");
     }
