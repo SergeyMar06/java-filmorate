@@ -7,10 +7,16 @@ import java.util.Set;
 
 public interface FilmStorage {
     Collection<Film> findAll();
+
     Film create(Film film);
+
     Film update(Film newFilm);
+
     Film findById(Long id);
+
     void likeTheMovie(Long filmId, Long userId);
+
     void removeLikeTheMovie(Long filmId, Long userId);
+
     Set<Film> getFilmWithTheMostLikes(Long count);
 }
