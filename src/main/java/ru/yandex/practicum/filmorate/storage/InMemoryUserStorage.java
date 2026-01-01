@@ -125,6 +125,10 @@ public class InMemoryUserStorage implements UserStorage {
             user.setFriends(new HashSet<>());
         }
 
+        if (friend.getFriends() == null) {
+            friend.setFriends(new HashSet<>());
+        }
+
         user.getFriends().add(friendId);
         friend.getFriends().add(id);
     }
