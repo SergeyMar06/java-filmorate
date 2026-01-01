@@ -4,8 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,7 +19,7 @@ class FilmControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new FilmController();
+        controller = new FilmController(new FilmService(new InMemoryFilmStorage()));
     }
 
     @Test
@@ -27,10 +30,17 @@ class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2014, 11, 7));
         film.setDuration(169);
 
-        Film created = controller.create(film);
+        // создаём фильм (create() void)
+        controller.create(film);
 
+        // достаём созданный фильм через findAll()
+        Collection<Film> allFilms = controller.findAll();
+        assertThat(allFilms).hasSize(1);
+
+        Film created = allFilms.iterator().next(); // первый (и единственный) фильм
         assertThat(created.getId()).isPositive();
-        assertThat(controller.findAll()).contains(created);
+        assertThat(created.getName()).isEqualTo(film.getName());
+        assertThat(created.getDescription()).isEqualTo(film.getDescription());
     }
 
     @Test
