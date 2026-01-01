@@ -28,16 +28,14 @@ class FilmControllerTest {
         film.setName("Интерстеллар");
         film.setDescription("Фильм о космосе");
         film.setReleaseDate(LocalDate.of(2014, 11, 7));
-        film.setDuration(169);
+        film.setDuration(169.0); // <-- Double
 
-        // создаём фильм (create() void)
         controller.create(film);
 
-        // достаём созданный фильм через findAll()
         Collection<Film> allFilms = controller.findAll();
         assertThat(allFilms).hasSize(1);
 
-        Film created = allFilms.iterator().next(); // первый (и единственный) фильм
+        Film created = allFilms.iterator().next();
         assertThat(created.getId()).isPositive();
         assertThat(created.getName()).isEqualTo(film.getName());
         assertThat(created.getDescription()).isEqualTo(film.getDescription());
@@ -49,7 +47,7 @@ class FilmControllerTest {
         film.setName("");
         film.setDescription("Описание");
         film.setReleaseDate(LocalDate.of(2020, 1, 1));
-        film.setDuration(120);
+        film.setDuration(120.0); // <-- Double
 
         assertThatThrownBy(() -> controller.create(film))
                 .isInstanceOf(InvalidFormatException.class)
@@ -60,9 +58,9 @@ class FilmControllerTest {
     void shouldThrowWhenDescriptionTooLong() {
         Film film = new Film();
         film.setName("Название");
-        film.setDescription("x".repeat(201)); // > 200 символов
+        film.setDescription("x".repeat(201));
         film.setReleaseDate(LocalDate.of(2020, 1, 1));
-        film.setDuration(100);
+        film.setDuration(100.0); // <-- Double
 
         assertThatThrownBy(() -> controller.create(film))
                 .isInstanceOf(InvalidFormatException.class)
@@ -75,7 +73,7 @@ class FilmControllerTest {
         film.setName("Название");
         film.setDescription("Описание");
         film.setReleaseDate(LocalDate.of(1800, 1, 1));
-        film.setDuration(90);
+        film.setDuration(90.0); // <-- Double
 
         assertThatThrownBy(() -> controller.create(film))
                 .isInstanceOf(InvalidFormatException.class)
@@ -88,7 +86,7 @@ class FilmControllerTest {
         film.setName("Название");
         film.setDescription("Описание");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(-50);
+        film.setDuration(-50.0); // <-- Double
 
         assertThatThrownBy(() -> controller.create(film))
                 .isInstanceOf(InvalidFormatException.class)
