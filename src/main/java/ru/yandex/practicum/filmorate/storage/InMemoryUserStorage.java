@@ -99,9 +99,6 @@ public class InMemoryUserStorage implements UserStorage {
             if (newUser.getBirthday() != null) {
                 oldUser.setBirthday(newUser.getBirthday());
             }
-            if (newUser.getBirthday() != null) {
-                oldUser.setBirthday(newUser.getBirthday());
-            }
 
             users.put(oldUser.getId(), oldUser);
 
@@ -114,25 +111,74 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     public void addFriend(Long id, Long friendId) {
-        users.get(id).getFriends().add(friendId);
+        User user = users.get(id);
+        User friend = users.get(friendId);
+
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с id = " + id + " не найден!");
+        }
+        if (friend == null) {
+            throw new IllegalArgumentException("Пользователь с id = " + friendId + " не найден!");
+        }
+
+        if (user.getFriends() == null) {
+            user.setFriends(new HashSet<>());
+        }
+
+        user.getFriends().add(friendId);
+        friend.getFriends().add(id);
     }
 
     public void removeFromFriends(Long id, Long friendId) {
-        users.get(id).getFriends().remove(friendId);
+        User user = users.get(id);
+        User friend = users.get(friendId);
+
+        if (user == null) {
+            throw new IllegalArgumentException("Пользователь с id = " + id + " не найден!");
+        }
+        if (friend == null) {
+            throw new IllegalArgumentException("Пользователь с id = " + friendId + " не найден!");
+        }
+
+        if (user.getFriends() != null) {
+            user.getFriends().remove(friendId);
+            friend.getFriends().remove(id);
+        }
     }
 
     public Set<Long> getFriendsToUser(Long id) {
+        User user = users.get(id);
+
+        if (user == null) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+
+        if (user.getFriends() == null) {
+            return new HashSet<>();
+        }
+
         return users.get(id).getFriends();
     }
 
     public Set<Long> getFriendsCommonOtherFriend(Long id, Long friendId) {
-        Set<Long> friendsUser1 = new HashSet<>(users.get(id).getFriends());
-        Set<Long> friendsUser2 = users.get(friendId).getFriends();
+        User user1 = users.get(id);
+        User user2 = users.get(friendId);
+
+        if (user1 == null) {
+            throw new NotFoundException("Пользователь с id = " + id + " не найден");
+        }
+        if (user2 == null) {
+            throw new NotFoundException("Пользователь с id = " + friendId + " не найден");
+        }
+
+        Set<Long> friendsUser1 = user1.getFriends() != null ? new HashSet<>(user1.getFriends()) : new HashSet<>();
+        Set<Long> friendsUser2 = user2.getFriends() != null ? user2.getFriends() : new HashSet<>();
 
         friendsUser1.retainAll(friendsUser2);
 
         return friendsUser1;
     }
+
 
     private long getNextId() {
         long currentMaxId = users.keySet()

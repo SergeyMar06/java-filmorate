@@ -118,39 +118,36 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     public void likeTheMovie(Long filmId, Long userId) {
-        films.get(filmId).getUsersLikesFilm().add(userId);
+        Film film = films.get(filmId);
+
+        if (film == null) {
+            throw new NotFoundException("Фильм с id = " + filmId + " не найден");
+        }
+
+        if (film.getUsersLikesFilm() == null) {
+            film.setUsersLikesFilm(new HashSet<>());
+        }
+
+        film.getUsersLikesFilm().add(userId);
     }
 
     public void removeLikeTheMovie(Long filmId, Long userId) {
-        films.get(filmId).getUsersLikesFilm().remove(userId);
-    }
+        Film film = films.get(filmId);
 
-    public Set<Film> getFilmWithTheMostLikes(Long count) {
-        Set<Film> sortedFilms = getSortedFilmsById();
+        if (film == null) {
+            throw new NotFoundException("Фильм с id = " + filmId + " не найден");
+        }
 
-        if (count == null) {
-            if (sortedFilms.size() < 10) {
-                return sortedFilms;
-            } else {
-                return sortedFilms.stream()
-                        .limit(10)
-                        .collect(Collectors.toCollection(LinkedHashSet::new));
-            }
-        } else {
-            return sortedFilms.stream()
-                    .limit(count.longValue())
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        if (film.getUsersLikesFilm() != null) {
+            film.getUsersLikesFilm().remove(userId);
         }
     }
 
-    public Set<Film> getSortedFilmsById() {
-        Set<Film> sortedFilms = new TreeSet<>(
-                Comparator.comparingInt(f -> f.getUsersLikesFilm().size())
-        );
-
-        sortedFilms.addAll(films.values());
-
-        return sortedFilms;
+    public Set<Film> getFilmWithTheMostLikes(Long count) {
+        return films.values().stream()
+                .sorted((f1, f2) -> Integer.compare(f2.getUsersLikesFilm().size(), f1.getUsersLikesFilm().size()))
+                .limit(count != null ? count : 10)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
 
