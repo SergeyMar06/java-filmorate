@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
@@ -17,10 +18,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     private HashMap<Long, Film> films = new HashMap<>();
     private UserStorage userStorage;
 
-    public InMemoryFilmStorage() {
-        this.userStorage = new InMemoryUserStorage();
-    }
-
+    @Autowired
     public InMemoryFilmStorage(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
