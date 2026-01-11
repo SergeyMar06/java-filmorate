@@ -22,13 +22,13 @@ public class FilmController {
     }
 
     @PostMapping
-    public void create(@RequestBody Film film) {
-        filmService.create(film);
+    public Film create(@RequestBody Film film) {
+        return filmService.create(film);
     }
 
     @PutMapping
-    public void update(@RequestBody Film newFilm) {
-        filmService.update(newFilm);
+    public Film update(@RequestBody Film newFilm) {
+        return filmService.update(newFilm);
     }
 
     @GetMapping("/{id}")

@@ -25,12 +25,12 @@ public class UserService {
         return userStorage.findById(id);
     }
 
-    public void create(User user) {
-        userStorage.create(user);
+    public User create(User user) {
+        return userStorage.create(user);
     }
 
-    public void update(User newUser) {
-        userStorage.update(newUser);
+    public User update(User newUser) {
+        return userStorage.update(newUser);
     }
 
     public void addFriend(Long id, Long friendId) {

@@ -27,13 +27,13 @@ public class UserController {
     }
 
     @PostMapping
-    public void create(@RequestBody User user) {
-        userService.create(user);
+    public User create(@RequestBody User user) {
+        return userService.create(user);
     }
 
     @PutMapping
-    public void update(@RequestBody User newUser) {
-        userService.update(newUser);
+    public User update(@RequestBody User newUser) {
+        return userService.update(newUser);
     }
 
     @PutMapping("/{id}/friends/{friendId}")

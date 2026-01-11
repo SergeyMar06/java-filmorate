@@ -19,12 +19,12 @@ public class FilmService {
         return filmStorage.findAll();
     }
 
-    public void create(Film film) {
-        filmStorage.create(film);
+    public Film create(Film film) {
+        return filmStorage.create(film);
     }
 
-    public void update(Film newFilm) {
-        filmStorage.update(newFilm);
+    public Film update(Film newFilm) {
+        return filmStorage.update(newFilm);
     }
 
     public Film findById(Long id) {
