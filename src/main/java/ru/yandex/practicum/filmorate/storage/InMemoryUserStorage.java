@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -30,7 +29,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    public User create(@RequestBody User user) {
+    public User create(User user) {
         log.info("Получен запрос на создание пользователя");
 
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
@@ -61,7 +60,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    public User update(@RequestBody User newUser) {
+    public User update(User newUser) {
         log.info("Получен запрос на обновление пользователя с id {}", newUser.getId());
 
         if (newUser.getId() == null) {
@@ -119,10 +118,10 @@ public class InMemoryUserStorage implements UserStorage {
         User friend = users.get(friendId);
 
         if (user == null) {
-            throw new IllegalArgumentException("Пользователь с id = " + id + " не найден!");
+            throw new NotFoundException("Пользователь с id = " + id + " не найден!");
         }
         if (friend == null) {
-            throw new IllegalArgumentException("Пользователь с id = " + friendId + " не найден!");
+            throw new NotFoundException("Пользователь с id = " + friendId + " не найден!");
         }
 
         if (user.getFriends() == null) {
@@ -142,10 +141,10 @@ public class InMemoryUserStorage implements UserStorage {
         User friend = users.get(friendId);
 
         if (user == null) {
-            throw new IllegalArgumentException("Пользователь с id = " + id + " не найден!");
+            throw new NotFoundException("Пользователь с id = " + id + " не найден!");
         }
         if (friend == null) {
-            throw new IllegalArgumentException("Пользователь с id = " + friendId + " не найден!");
+            throw new NotFoundException("Пользователь с id = " + friendId + " не найден!");
         }
 
         if (user.getFriends() != null) {

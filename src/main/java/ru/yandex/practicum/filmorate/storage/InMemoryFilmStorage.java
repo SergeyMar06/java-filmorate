@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
+
 import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -15,6 +15,11 @@ import java.util.stream.Collectors;
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
     private HashMap<Long, Film> films = new HashMap<>();
+    private UserStorage userStorage;
+
+    public InMemoryFilmStorage(UserStorage userStorage) {
+        this.userStorage = userStorage;
+    }
 
     @Override
     public Collection<Film> findAll() {
@@ -34,7 +39,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film create(@RequestBody Film film) {
+    public Film create(Film film) {
         log.info("Получен запрос на создание фильма");
 
         if (film.getName() == null || film.getName().isBlank()) {
@@ -71,7 +76,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film update(@RequestBody Film newFilm) {
+    public Film update(Film newFilm) {
         log.info("Получен запрос на обновление фильма с id {}", newFilm.getId());
 
         if (newFilm.getId() == null) {
@@ -140,6 +145,8 @@ public class InMemoryFilmStorage implements FilmStorage {
             film.setUsersLikesFilm(new HashSet<>());
         }
 
+        userStorage.findById(userId);
+
         film.getUsersLikesFilm().add(userId);
     }
 
@@ -149,6 +156,8 @@ public class InMemoryFilmStorage implements FilmStorage {
         if (film == null) {
             throw new NotFoundException("Фильм с id = " + filmId + " не найден");
         }
+
+        userStorage.findById(userId);
 
         if (film.getUsersLikesFilm() != null) {
             film.getUsersLikesFilm().remove(userId);
