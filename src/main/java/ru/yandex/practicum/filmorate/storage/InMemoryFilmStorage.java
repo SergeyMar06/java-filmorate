@@ -17,6 +17,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     private HashMap<Long, Film> films = new HashMap<>();
     private UserStorage userStorage;
 
+    public InMemoryFilmStorage() {
+        this.userStorage = new InMemoryUserStorage();
+    }
+
     public InMemoryFilmStorage(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
