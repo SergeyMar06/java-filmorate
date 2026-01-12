@@ -47,12 +47,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public Set<Long> getFriendToUser(@PathVariable Long id) {
+    public Set<User> getFriendToUser(@PathVariable Long id) {
         return userService.getFriendsToUser(id);
     }
 
-    @PutMapping("/{id}/friends/common/{otherId}")
-    public Set<Long> getFriendsCommonOtherFriend(@PathVariable Long id, @PathVariable Long otherId) {
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public Set<User> getFriendsCommonOtherFriend(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.getFriendsCommonOtherFriend(id, otherId);
     }
 }

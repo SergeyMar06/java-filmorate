@@ -35,17 +35,19 @@ public class UserService {
 
     public void addFriend(Long id, Long friendId) {
         userStorage.addFriend(id, friendId);
+        userStorage.addFriend(friendId, id);
     }
 
     public void removeFromFriends(Long id, Long friendId) {
         userStorage.removeFromFriends(id, friendId);
+        userStorage.removeFromFriends(friendId, id);
     }
 
-    public Set<Long> getFriendsToUser(Long id) {
+    public Set<User> getFriendsToUser(Long id) {
         return userStorage.getFriendsToUser(id);
     }
 
-    public Set<Long> getFriendsCommonOtherFriend(Long id, Long friendId) {
+    public Set<User> getFriendsCommonOtherFriend(Long id, Long friendId) {
         return userStorage.getFriendsCommonOtherFriend(id, friendId);
     }
 }

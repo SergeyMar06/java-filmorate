@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -128,12 +129,12 @@ public class InMemoryUserStorage implements UserStorage {
             user.setFriends(new HashSet<>());
         }
 
-        if (friend.getFriends() == null) {
-            friend.setFriends(new HashSet<>());
-        }
+//        if (friend.getFriends() == null) {
+//            friend.setFriends(new HashSet<>());
+//        }
 
         user.getFriends().add(friendId);
-        friend.getFriends().add(id);
+//        friend.getFriends().add(id);
     }
 
     public void removeFromFriends(Long id, Long friendId) {
@@ -149,11 +150,11 @@ public class InMemoryUserStorage implements UserStorage {
 
         if (user.getFriends() != null) {
             user.getFriends().remove(friendId);
-            friend.getFriends().remove(id);
+//            friend.getFriends().remove(id);
         }
     }
 
-    public Set<Long> getFriendsToUser(Long id) {
+    public Set<User> getFriendsToUser(Long id) {
         User user = users.get(id);
 
         if (user == null) {
@@ -164,10 +165,12 @@ public class InMemoryUserStorage implements UserStorage {
             return new HashSet<>();
         }
 
-        return users.get(id).getFriends();
+        return users.get(id).getFriends().stream()
+                .map(friendId -> users.get(friendId))
+                .collect(Collectors.toSet());
     }
 
-    public Set<Long> getFriendsCommonOtherFriend(Long id, Long friendId) {
+    public Set<User> getFriendsCommonOtherFriend(Long id, Long friendId) {
         User user1 = users.get(id);
         User user2 = users.get(friendId);
 
@@ -183,7 +186,9 @@ public class InMemoryUserStorage implements UserStorage {
 
         friendsUser1.retainAll(friendsUser2);
 
-        return friendsUser1;
+        return friendsUser1.stream()
+                .map(friendCommonId -> users.get(friendCommonId))
+                .collect(Collectors.toSet());
     }
 
 
