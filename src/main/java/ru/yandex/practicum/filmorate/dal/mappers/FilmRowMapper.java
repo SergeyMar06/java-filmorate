@@ -20,9 +20,9 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setName(resultSet.getString("name"));
         film.setDuration(resultSet.getInt("duration"));
 
-        Timestamp release_date = resultSet.getTimestamp("release_date");
-        if (release_date != null) {
-            film.setReleaseDate(release_date.toLocalDateTime().toLocalDate());
+        Timestamp releaseDate = resultSet.getTimestamp("release_date");
+        if (releaseDate != null) {
+            film.setReleaseDate(releaseDate.toLocalDateTime().toLocalDate());
         }
 
 
@@ -30,7 +30,6 @@ public class FilmRowMapper implements RowMapper<Film> {
         if (!resultSet.wasNull()) {
             Mpa mpa = new Mpa();
             mpa.setId(mpaId);
-            // name можно подгружать отдельно при необходимости
             film.setMpa(mpa);
         }
 
