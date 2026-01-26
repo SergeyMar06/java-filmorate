@@ -1,53 +1,87 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
+import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 
 @Service
 public class UserService {
 
-    private UserStorage userStorage;
+    private UserRepository userRepository;
 
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     public Collection<User> findAll() {
-        return userStorage.findAll();
+        return userRepository.findAll();
     }
 
-    public User findById(Long id) {
-        return userStorage.findById(id);
+    public Optional<User> findById(Integer id) {
+        return userRepository.findById(id);
     }
 
     public User create(User user) {
-        return userStorage.create(user);
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+
+        if (!user.getLogin().chars().noneMatch(Character::isWhitespace)) {
+            throw new InvalidFormatException("Логин не может содержать пробелов");
+        }
+
+        return userRepository.save(user);
     }
 
     public User update(User newUser) {
-        return userStorage.update(newUser);
+        if (newUser.getId() == null || userRepository.findById(newUser.getId()).isEmpty()) {
+            throw new NotFoundException("Пользователь с id = " + newUser.getId() + " не найден");
+        }
+
+        if (!newUser.getLogin().chars().noneMatch(Character::isWhitespace)) {
+            throw new InvalidFormatException("Логин не может содержать пробелов");
+        }
+
+        return userRepository.update(newUser);
     }
 
-    public void addFriend(Long id, Long friendId) {
-        userStorage.addFriend(id, friendId);
-        userStorage.addFriend(friendId, id);
+    public void addFriend(Integer id, Integer friendId) {
+        if (userRepository.findById(id).isEmpty()) {
+            throw new NotFoundException("Пользователя с id = " + id + " нет");
+        }
+        if (userRepository.findById(friendId).isEmpty()) {
+            throw new NotFoundException("Пользователя с id = " + friendId + " нет");
+        }
+
+        userRepository.addFriend(id, friendId);
     }
 
-    public void removeFromFriends(Long id, Long friendId) {
-        userStorage.removeFromFriends(id, friendId);
-        userStorage.removeFromFriends(friendId, id);
+    public void removeFromFriends(Integer id, Integer friendId) {
+        if (userRepository.findById(id).isEmpty()) {
+            throw new NotFoundException("Пользователя с id = " + id + " нет");
+        }
+        if (userRepository.findById(friendId).isEmpty()) {
+            throw new NotFoundException("Пользователя с id = " + friendId + " нет");
+        }
+
+        userRepository.removeFromFriends(id, friendId);
     }
 
-    public Set<User> getFriendsToUser(Long id) {
-        return userStorage.getFriendsToUser(id);
+    public Set<User> getFriendsToUser(Integer id) {
+        if (userRepository.findById(id).isEmpty()) {
+            throw new NotFoundException("Пользователя с id = " + id + " нет");
+        }
+        return userRepository.getFriendsToUser(id);
     }
 
-    public Set<User> getFriendsCommonOtherFriend(Long id, Long friendId) {
-        return userStorage.getFriendsCommonOtherFriend(id, friendId);
+    public Set<User> getFriendsCommonOtherFriend(Integer id, Integer friendId) {
+        return userRepository.getFriendsCommonOtherFriend(id, friendId);
     }
 }

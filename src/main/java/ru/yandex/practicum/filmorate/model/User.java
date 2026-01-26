@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 
@@ -11,10 +12,14 @@ import java.util.Set;
  */
 @Data
 public class User {
-    private Long id;
+    private Integer id;
+    @Email
+    @NotBlank
     private String email;
+    @NotBlank
     private String login;
     private String name;
+    @PastOrPresent
     private LocalDate birthday;
     private Set<Long> friends;
 }

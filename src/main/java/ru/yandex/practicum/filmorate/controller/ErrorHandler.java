@@ -1,16 +1,34 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class ErrorHandler {
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        Map<String, String> errors = new HashMap<>();
+
+        e.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = ((FieldError) error).getField();
+            String errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+
+        return errors;
+    }
 
     // 400 — ошибка валидации
     @ExceptionHandler(InvalidFormatException.class)
@@ -21,6 +39,25 @@ public class ErrorHandler {
                 "message", e.getMessage()
         );
     }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
+        String message = e.getMessage();
+        String errorMessage = "";
+
+        if (message.contains("genre")) {
+            errorMessage = "Жанр не найден";
+        } else if (message.contains("mpa")) {
+            errorMessage = "Mpa не найден";
+        }
+
+        return Map.of(
+                "error", "Ошибка",
+                "message", errorMessage
+        );
+    }
+
 
     // 404 — объект не найден
     @ExceptionHandler(NotFoundException.class)
@@ -41,4 +78,15 @@ public class ErrorHandler {
                 "message", e.getMessage()
         );
     }
+
+    // 400 — BadRequestException
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleBadRequestException(BadRequestException e) {
+        return Map.of(
+                "error", "Ошибка запроса",
+                "message", e.getMessage()
+        );
+    }
+
 }
