@@ -35,9 +35,9 @@ public class FilmService {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new BadRequestException("Название фильма не может быть пустым");
         }
-        if (film.getDescription() == null || film.getDescription().length() > 200) {
-            throw new BadRequestException("Описание слишком длинное");
-        }
+//        if (film.getDescription() == null || film.getDescription().length() > 200) {
+//            throw new BadRequestException("Описание слишком длинное");
+//        }
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new BadRequestException("Неверная дата релиза");
         }

@@ -44,8 +44,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void removeFromFriends(@PathVariable Integer id, @PathVariable Integer friendId) {
-        userService.removeFromFriends(id, friendId);
+    public User removeFromFriends(@PathVariable Integer id, @PathVariable Integer friendId) {
+        return userService.removeFromFriends(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
