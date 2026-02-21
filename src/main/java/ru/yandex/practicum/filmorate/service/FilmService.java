@@ -91,5 +91,6 @@ public class FilmService {
     }
 
     public List<Film> getCommonSortedFilms(Integer userId, Integer friendId) {
-        return filmRepository.getCommonSortedFilms(userId, friendId); }
+        return filmRepository.getCommonSortedFilms(userId, friendId);
     }
+}
