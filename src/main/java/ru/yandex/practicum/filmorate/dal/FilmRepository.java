@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dal;
 
+import java.util.ArrayList;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -42,6 +43,16 @@ public class FilmRepository extends BaseRepository<Film> {
                     "GROUP BY f.id " +
                     "ORDER BY COUNT(fl.user_id) DESC " +
                     "LIMIT ?";
+
+    private static final String GET_COMMON_FILMS =
+            "SELECT f.* " +
+                    "FROM films AS f " +
+                    "JOIN likes AS l1 ON f.id = l1.film_id " +
+                    "JOIN likes AS l2 ON f.id = l2.film_id " +
+                    "LEFT JOIN likes AS l ON f.id = l.film_id " +
+                    "WHERE l1.user_id = ? AND l2.user_id = ? " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC;";
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -123,6 +134,18 @@ public class FilmRepository extends BaseRepository<Film> {
         return films;
     }
 
+    public List<Film> getCommonSortedFilms(Integer userId, Integer friendId) {
+        List<Film> films = jdbc.query(GET_COMMON_FILMS, mapper, userId, friendId);
+
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            if (film.getMpa() != null) {
+                film.setMpa(getMpaById(film.getMpa().getId()));
+            }
+        }
+
+        return films;
+    }
 
     private Set<Genre> getGenresByFilmId(Integer filmId) {
         List<Genre> genres = jdbc.query(
