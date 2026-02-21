@@ -48,20 +48,20 @@ CREATE TABLE IF NOT EXISTS likes(
     FOREIGN KEY(film_id) REFERENCES films(id)
 );
 CREATE TABLE IF NOT EXISTS reviews (
-    reviewId BIGINT AUTO_INCREMENT PRIMARY KEY,
+    reviewId INTEGER AUTO_INCREMENT PRIMARY KEY,
     content VARCHAR(255),
     isPositive BOOLEAN,
-    userId BIGINT,
-    filmId BIGINT,
-    useful BIGINT DEFAULT 0,
+    userId INTEGER,
+    filmId INTEGER,
+    useful INTEGER DEFAULT 0,
     FOREIGN KEY (filmId) REFERENCES films(id) ON delete CASCADE,
     FOREIGN KEY (userId) REFERENCES users(id) ON delete CASCADE
 );
 CREATE TABLE IF NOT EXISTS reviewLikes (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    id INTEGER AUTO_INCREMENT PRIMARY KEY,
     isLike BOOLEAN,
-    reviewId BIGINT,
-    userId BIGINT,
+    reviewId INTEGER,
+    userId INTEGER,
     FOREIGN KEY (reviewId) REFERENCES reviews(reviewId) ON delete CASCADE,
     FOREIGN KEY (userId) REFERENCES users(id) ON delete CASCADE
 );
