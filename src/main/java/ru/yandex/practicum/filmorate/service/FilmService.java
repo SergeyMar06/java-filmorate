@@ -90,4 +90,14 @@ public class FilmService {
     public List<Film> getFilmWithTheMostLikes(Integer count) {
         return filmRepository.findMostLikedFilms(count);
     }
+
+    public List<Film> findAllFilmByDirector(Long directorId, String sortBy) {
+        if ("likes".equals(sortBy)) {
+            return filmRepository.findFilmsByDirectorSortedByLikes(directorId);
+        } else if ("year".equals(sortBy)) {
+            return filmRepository.findFilmsByDirectorSortedByYear(directorId);
+        } else {
+            throw new IllegalArgumentException("Unknown sortBy value: " + sortBy);
+        }
+    }
 }

@@ -52,4 +52,10 @@ public class FilmController {
     public List<Film> getFilmWithTheMostLikes(@RequestParam("count") Integer count) {
         return filmService.getFilmWithTheMostLikes(count);
     }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> findAllFilmByDirector(@PathVariable Long directorId,
+                                            @RequestParam("sortBy") String sortBy) {
+        return filmService.findAllFilmByDirector(directorId, sortBy);
+    }
 }
