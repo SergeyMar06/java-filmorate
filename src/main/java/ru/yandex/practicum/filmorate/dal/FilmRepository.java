@@ -208,7 +208,7 @@ public class FilmRepository extends BaseRepository<Film> {
         );
     }
 
-    public List<Film> findFilmsByDirectorSortedByLikes(Long directorId) {
+    public List<Film> findFilmsByDirectorSortedByLikes(Integer directorId) {
         List<Film> films = jdbc.query(FIND_ALL_FILMS_BY_DIRECTOR, mapper, directorId);
 
         // подгружаем связи
@@ -221,7 +221,7 @@ public class FilmRepository extends BaseRepository<Film> {
         return films;
     }
 
-    public List<Film> findFilmsByDirectorSortedByYear(Long directorId) {
+    public List<Film> findFilmsByDirectorSortedByYear(Integer directorId) {
         List<Film> films = jdbc.query(FIND_ALL_FILMS_BY_YEARS, mapper, directorId);
 
         films.forEach(f -> {
