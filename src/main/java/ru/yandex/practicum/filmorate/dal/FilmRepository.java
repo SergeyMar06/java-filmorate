@@ -190,7 +190,7 @@ public class FilmRepository extends BaseRepository<Film> {
         films.forEach(f -> {
             f.setGenres(getGenresByFilmId(f.getId()));
             if (f.getMpa() != null) f.setMpa(getMpaById(f.getMpa().getId()));
-
+            f.setDirectors(getDirectorsByFilmId(f.getId()));
         });
 
         return films;
@@ -202,7 +202,7 @@ public class FilmRepository extends BaseRepository<Film> {
         films.forEach(f -> {
             f.setGenres(getGenresByFilmId(f.getId()));
             if (f.getMpa() != null) f.setMpa(getMpaById(f.getMpa().getId()));
-
+            f.setDirectors(getDirectorsByFilmId(f.getId()));
         });
 
         return films;
