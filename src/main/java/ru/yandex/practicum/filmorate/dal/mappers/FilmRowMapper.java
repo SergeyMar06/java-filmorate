@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 @Component
 public class FilmRowMapper implements RowMapper<Film> {
@@ -19,13 +20,9 @@ public class FilmRowMapper implements RowMapper<Film> {
         film.setName(resultSet.getString("name"));
         film.setDuration(resultSet.getInt("duration"));
 
-//        Timestamp releaseDate = resultSet.getTimestamp("release_date");
-//        if (releaseDate != null) {
-//            film.setReleaseDate(releaseDate.toLocalDateTime().toLocalDate());
-//        }
-        java.sql.Date releaseDate = resultSet.getDate("release_date");
+        Timestamp releaseDate = resultSet.getTimestamp("release_date");
         if (releaseDate != null) {
-            film.setReleaseDate(releaseDate.toLocalDate());
+            film.setReleaseDate(releaseDate.toLocalDateTime().toLocalDate());
         }
 
 
