@@ -52,6 +52,17 @@ public class FilmRepository extends BaseRepository<Film> {
                     "WHERE l1.user_id = ? AND l2.user_id = ? " +
                     "GROUP BY f.id " +
                     "ORDER BY COUNT(l.user_id) DESC;";
+    private static final String FIND_POPULAR_FILMS_BY_GENRE_AND_YEAR =
+            "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE (:genreId IS NULL OR EXISTS (" +
+                    "   SELECT 1 FROM film_genre fg WHERE fg.film_id = f.id AND fg.genre_id = :genreId" +
+                    ")) " +
+                    "AND (:year IS NULL OR EXTRACT(YEAR FROM f.release_date) = :year) " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT :limit";
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -176,4 +187,48 @@ public class FilmRepository extends BaseRepository<Film> {
         );
     }
 
+    public List<Film> findMostPopularsByGenreAndYear(Integer count, Long genreId, Integer year) {
+        List<Film> films;
+
+        if (genreId != null && year != null) {
+            String sql = "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE EXISTS (SELECT 1 FROM film_genre fg WHERE fg.film_id = f.id AND fg.genre_id = ?) " +
+                    "AND EXTRACT(YEAR FROM f.release_date) = ? " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT ?";
+            films = jdbc.query(sql, mapper, genreId, year, count);
+        } else if (genreId != null) {
+            String sql = "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE EXISTS (SELECT 1 FROM film_genre fg WHERE fg.film_id = f.id AND fg.genre_id = ?) " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT ?";
+            films = jdbc.query(sql, mapper, genreId, count);
+        } else if (year != null) {
+            String sql = "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT ?";
+            films = jdbc.query(sql, mapper, year, count);
+        } else {
+            return findMostLikedFilms(count);
+        }
+
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            if (film.getMpa() != null) {
+                film.setMpa(getMpaById(film.getMpa().getId()));
+            }
+        }
+
+        return films;
+    }
 }
