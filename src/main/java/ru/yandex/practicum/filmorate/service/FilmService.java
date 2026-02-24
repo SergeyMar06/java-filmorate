@@ -90,4 +90,17 @@ public class FilmService {
     public List<Film> getFilmWithTheMostLikes(Integer count) {
         return filmRepository.findMostLikedFilms(count);
     }
+
+   public List<Film> getPopular(Integer count, Long genreId, Integer year) {
+        if (count == null) {
+            count = 10;
+        }
+
+        if (genreId != null) {
+            genreRepository.findById(genreId)
+                    .orElseThrow(() -> new NotFoundException("Жанр с id = " + genreId + " не найден"));
+        }
+
+        return filmRepository.findMostPopularsByGenreAndYear(count, genreId, year);
+   }
 }
