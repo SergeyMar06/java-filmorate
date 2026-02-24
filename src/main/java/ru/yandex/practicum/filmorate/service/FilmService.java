@@ -1,5 +1,9 @@
 package ru.yandex.practicum.filmorate.service;
 
+import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.dal.GenreRepository;
@@ -7,13 +11,9 @@ import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-
 @Service
 public class FilmService {
+
     private FilmRepository filmRepository;
     private MpaService mpaService;
     private GenreRepository genreRepository;
@@ -50,7 +50,6 @@ public class FilmService {
         if (mpaService.findById(film.getMpa().getId()) == null) {
             throw new NotFoundException("Mpa с id = " + film.getMpa().getId() + " нет");
         }
-
 
         film = filmRepository.save(film);
 
@@ -91,7 +90,11 @@ public class FilmService {
         return filmRepository.findMostLikedFilms(count);
     }
 
-   public List<Film> getPopular(Integer count, Long genreId, Integer year) {
+    public List<Film> getCommonSortedFilms(Integer userId, Integer friendId) {
+        return filmRepository.getCommonSortedFilms(userId, friendId);
+    }
+
+    public List<Film> getPopular(Integer count, Long genreId, Integer year) {
         if (count == null) {
             count = 10;
         }
@@ -102,5 +105,5 @@ public class FilmService {
         }
 
         return filmRepository.findMostPopularsByGenreAndYear(count, genreId, year);
-   }
+    }
 }
