@@ -93,7 +93,8 @@ public class FilmService {
     public List<Film> getCommonSortedFilms(Integer userId, Integer friendId) {
         return filmRepository.getCommonSortedFilms(userId, friendId);
     }
-   public List<Film> getPopular(Integer count, Long genreId, Integer year) {
+
+    public List<Film> getPopular(Integer count, Long genreId, Integer year) {
         if (count == null) {
             count = 10;
         }
@@ -104,5 +105,5 @@ public class FilmService {
         }
 
         return filmRepository.findMostPopularsByGenreAndYear(count, genreId, year);
-   }
+    }
 }
