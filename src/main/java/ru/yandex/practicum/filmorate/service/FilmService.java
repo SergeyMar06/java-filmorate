@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.DirectorRepository;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.dal.GenreRepository;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -15,13 +17,19 @@ import java.util.Optional;
 @Service
 public class FilmService {
     private FilmRepository filmRepository;
+    private UserRepository userRepository;
+    private DirectorRepository directorRepository;
     private MpaService mpaService;
     private GenreRepository genreRepository;
 
-    public FilmService(FilmRepository filmRepository, MpaService mpaService, GenreRepository genreRepository) {
+    public FilmService(FilmRepository filmRepository, MpaService mpaService,
+                       GenreRepository genreRepository, UserRepository userRepository,
+                       DirectorRepository directorRepository) {
         this.filmRepository = filmRepository;
         this.mpaService = mpaService;
         this.genreRepository = genreRepository;
+        this.userRepository = userRepository;
+        this.directorRepository = directorRepository;
     }
 
     public Collection<Film> findAll() {
@@ -80,10 +88,26 @@ public class FilmService {
     }
 
     public void likeTheMovie(Integer filmId, Integer userId) {
+        if (filmRepository.findById(filmId).isEmpty()) {
+            throw new NotFoundException("Фильм не найден");
+        }
+
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+
         filmRepository.likeFilm(filmId, userId);
     }
 
     public void removeLikeTheMovie(Integer filmId, Integer userId) {
+        if (filmRepository.findById(filmId).isEmpty()) {
+            throw new NotFoundException("Фильм не найден");
+        }
+
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+
         filmRepository.removeLike(filmId, userId);
     }
 
@@ -92,6 +116,10 @@ public class FilmService {
     }
 
     public List<Film> findAllFilmByDirector(Integer directorId, String sortBy) {
+        if (directorRepository.findById(directorId).isEmpty()) {
+            throw new NotFoundException("Режиссёр не найден");
+        }
+
         if ("likes".equals(sortBy)) {
             return filmRepository.findFilmsByDirectorSortedByLikes(directorId);
         } else if ("year".equals(sortBy)) {

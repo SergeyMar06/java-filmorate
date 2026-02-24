@@ -63,7 +63,7 @@ public class UserService {
         userRepository.addFriend(id, friendId);
     }
 
-    public User removeFromFriends(Integer id, Integer friendId) {
+    public Set<User> removeFromFriends(Integer id, Integer friendId) {
         if (userRepository.findById(id).isEmpty()) {
             throw new NotFoundException("Пользователя с id = " + id + " нет");
         }

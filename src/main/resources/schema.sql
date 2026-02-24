@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS films (
     name VARCHAR(50),
     description VARCHAR(250),
     release_date DATE,
-    duration REAL,
+    duration INTEGER,
     mpa_id INTEGER,
     FOREIGN KEY(mpa_id) REFERENCES mpa(id) ON DELETE CASCADE
 );
