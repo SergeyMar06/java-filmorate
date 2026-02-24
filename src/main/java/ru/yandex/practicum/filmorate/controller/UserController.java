@@ -19,7 +19,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@RequestParam int userId) {
+    public void deleteUser(@PathVariable int userId) {
         userService.removeUser(userId);
     }
 
