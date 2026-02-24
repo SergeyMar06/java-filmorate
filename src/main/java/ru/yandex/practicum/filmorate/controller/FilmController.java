@@ -1,17 +1,25 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.FilmService;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 @RestController
 @RequestMapping("/films")
 public class FilmController {
+
     public FilmService filmService;
 
     public FilmController(FilmService filmService) {
@@ -49,8 +57,17 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getFilmWithTheMostLikes(@RequestParam("count") Integer count) {
-        return filmService.getFilmWithTheMostLikes(count);
+    public List<Film> getPopular(
+            @RequestParam(value = "count", required = false, defaultValue = "10") Integer count,
+            @RequestParam(value = "genreId", required = false) Long genreId,
+            @RequestParam(value = "year", required = false) Integer year) {
+        return filmService.getPopular(count, genreId, year);
+    }
+
+    @GetMapping("/common")
+    public List<Film> getCommonSortedFilms(@RequestParam("userId") Integer userId,
+            @RequestParam("friendId") Integer friendId) {
+        return filmService.getCommonSortedFilms(userId, friendId);
     }
 
     @GetMapping("/director/{directorId}")

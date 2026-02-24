@@ -59,6 +59,26 @@ public class FilmRepository extends BaseRepository<Film> {
                     "JOIN film_director fd ON f.id = fd.film_id " +
                     "WHERE fd.director_id = ? " +
                     "ORDER BY f.release_date";
+    private static final String GET_COMMON_FILMS =
+            "SELECT f.* " +
+                    "FROM films AS f " +
+                    "JOIN likes AS l1 ON f.id = l1.film_id " +
+                    "JOIN likes AS l2 ON f.id = l2.film_id " +
+                    "LEFT JOIN likes AS l ON f.id = l.film_id " +
+                    "WHERE l1.user_id = ? AND l2.user_id = ? " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC;";
+    private static final String FIND_POPULAR_FILMS_BY_GENRE_AND_YEAR =
+            "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE (:genreId IS NULL OR EXISTS (" +
+                    "   SELECT 1 FROM film_genre fg WHERE fg.film_id = f.id AND fg.genre_id = :genreId" +
+                    ")) " +
+                    "AND (:year IS NULL OR EXTRACT(YEAR FROM f.release_date) = :year) " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT :limit";
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -152,6 +172,18 @@ public class FilmRepository extends BaseRepository<Film> {
         return films;
     }
 
+    public List<Film> getCommonSortedFilms(Integer userId, Integer friendId) {
+        List<Film> films = jdbc.query(GET_COMMON_FILMS, mapper, userId, friendId);
+
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            if (film.getMpa() != null) {
+                film.setMpa(getMpaById(film.getMpa().getId()));
+            }
+        }
+
+        return films;
+    }
 
     private Set<Genre> getGenresByFilmId(Integer filmId) {
         List<Genre> genres = jdbc.query(
@@ -235,5 +267,49 @@ public class FilmRepository extends BaseRepository<Film> {
                     director.getId()
             );
         }
+    }
+    public List<Film> findMostPopularsByGenreAndYear(Integer count, Long genreId, Integer year) {
+        List<Film> films;
+
+        if (genreId != null && year != null) {
+            String sql = "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE EXISTS (SELECT 1 FROM film_genre fg WHERE fg.film_id = f.id AND fg.genre_id = ?) " +
+                    "AND EXTRACT(YEAR FROM f.release_date) = ? " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT ?";
+            films = jdbc.query(sql, mapper, genreId, year, count);
+        } else if (genreId != null) {
+            String sql = "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE EXISTS (SELECT 1 FROM film_genre fg WHERE fg.film_id = f.id AND fg.genre_id = ?) " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT ?";
+            films = jdbc.query(sql, mapper, genreId, count);
+        } else if (year != null) {
+            String sql = "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN likes l ON f.id = l.film_id " +
+                    "WHERE EXTRACT(YEAR FROM f.release_date) = ? " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC " +
+                    "LIMIT ?";
+            films = jdbc.query(sql, mapper, year, count);
+        } else {
+            return findMostLikedFilms(count);
+        }
+
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            if (film.getMpa() != null) {
+                film.setMpa(getMpaById(film.getMpa().getId()));
+            }
+        }
+
+        return films;
     }
 }
