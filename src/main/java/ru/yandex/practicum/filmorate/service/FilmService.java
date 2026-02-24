@@ -4,9 +4,12 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.DirectorRepository;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
 import ru.yandex.practicum.filmorate.dal.GenreRepository;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -15,13 +18,19 @@ import ru.yandex.practicum.filmorate.model.Film;
 public class FilmService {
 
     private FilmRepository filmRepository;
+    private UserRepository userRepository;
+    private DirectorRepository directorRepository;
     private MpaService mpaService;
     private GenreRepository genreRepository;
 
-    public FilmService(FilmRepository filmRepository, MpaService mpaService, GenreRepository genreRepository) {
+    public FilmService(FilmRepository filmRepository, MpaService mpaService,
+                       GenreRepository genreRepository, UserRepository userRepository,
+                       DirectorRepository directorRepository) {
         this.filmRepository = filmRepository;
         this.mpaService = mpaService;
         this.genreRepository = genreRepository;
+        this.userRepository = userRepository;
+        this.directorRepository = directorRepository;
     }
 
     public Collection<Film> findAll() {
@@ -35,9 +44,7 @@ public class FilmService {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new BadRequestException("Название фильма не может быть пустым");
         }
-        if (film.getDescription() == null || film.getDescription().length() > 200) {
-            throw new BadRequestException("Описание слишком длинное");
-        }
+
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new BadRequestException("Неверная дата релиза");
         }
@@ -79,15 +86,45 @@ public class FilmService {
     }
 
     public void likeTheMovie(Integer filmId, Integer userId) {
+        if (filmRepository.findById(filmId).isEmpty()) {
+            throw new NotFoundException("Фильм не найден");
+        }
+
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+
         filmRepository.likeFilm(filmId, userId);
     }
 
     public void removeLikeTheMovie(Integer filmId, Integer userId) {
+        if (filmRepository.findById(filmId).isEmpty()) {
+            throw new NotFoundException("Фильм не найден");
+        }
+
+        if (userRepository.findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователь не найден");
+        }
+
         filmRepository.removeLike(filmId, userId);
     }
 
     public List<Film> getFilmWithTheMostLikes(Integer count) {
         return filmRepository.findMostLikedFilms(count);
+    }
+
+    public List<Film> findAllFilmByDirector(Integer directorId, String sortBy) {
+        if (directorRepository.findById(directorId).isEmpty()) {
+            throw new NotFoundException("Режиссёр не найден");
+        }
+
+        if ("likes".equals(sortBy)) {
+            return filmRepository.findFilmsByDirectorSortedByLikes(directorId);
+        } else if ("year".equals(sortBy)) {
+            return filmRepository.findFilmsByDirectorSortedByYear(directorId);
+        } else {
+            throw new IllegalArgumentException("Unknown sortBy value: " + sortBy);
+        }
     }
 
     public List<Film> getCommonSortedFilms(Integer userId, Integer friendId) {

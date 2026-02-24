@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dal;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -23,7 +24,7 @@ public class FilmRepository extends BaseRepository<Film> {
             "VALUES (?, ?, ?, ?, ?)";
 
     private static final String UPDATE_QUERY =
-            "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? " +
+            "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ?" +
                     "WHERE id = ?";
 
     private static final String FIND_GENRES_BY_FILM =
@@ -43,6 +44,21 @@ public class FilmRepository extends BaseRepository<Film> {
                     "ORDER BY COUNT(fl.user_id) DESC " +
                     "LIMIT ?";
 
+    private static final String FIND_ALL_FILMS_BY_DIRECTOR =
+            "SELECT f.* " +
+                    "FROM films f " +
+                    "JOIN film_director fd ON f.id = fd.film_id " +
+                    "LEFT JOIN likes l ON l.film_id = f.id " +
+                    "WHERE fd.director_id = ? " +
+                    "GROUP BY f.id " +
+                    "ORDER BY COUNT(l.user_id) DESC";
+
+    private static final String FIND_ALL_FILMS_BY_YEARS =
+            "SELECT f.* " +
+                    "FROM films f " +
+                    "JOIN film_director fd ON f.id = fd.film_id " +
+                    "WHERE fd.director_id = ? " +
+                    "ORDER BY f.release_date";
     private static final String GET_COMMON_FILMS =
             "SELECT f.* " +
                     "FROM films AS f " +
@@ -76,6 +92,8 @@ public class FilmRepository extends BaseRepository<Film> {
             if (film.getMpa() != null) {
                 film.setMpa(getMpaById(film.getMpa().getId()));
             }
+
+            film.setDirectors(getDirectorsByFilmId(film.getId()));
         }
 
         return films;
@@ -89,6 +107,8 @@ public class FilmRepository extends BaseRepository<Film> {
             if (film.getMpa() != null) {
                 film.setMpa(getMpaById(film.getMpa().getId()));
             }
+
+            film.setDirectors(getDirectorsByFilmId(film.getId()));
         });
 
         return filmOpt;
@@ -99,12 +119,14 @@ public class FilmRepository extends BaseRepository<Film> {
                 INSERT_QUERY,
                 film.getName(),
                 film.getDescription(),
-                film.getReleaseDate(),
+                film.getReleaseDate() != null ? java.sql.Date.valueOf(film.getReleaseDate()) : null,
                 film.getDuration(),
                 film.getMpa() != null ? film.getMpa().getId() : null
         );
 
         film.setId(id);
+
+        saveFilmDirectors(id, film.getDirectors());
 
         return film;
     }
@@ -114,11 +136,15 @@ public class FilmRepository extends BaseRepository<Film> {
                 UPDATE_QUERY,
                 film.getName(),
                 film.getDescription(),
-                film.getReleaseDate(),
+                film.getReleaseDate() != null ? java.sql.Date.valueOf(film.getReleaseDate()) : null,
                 film.getDuration(),
                 film.getMpa() != null ? film.getMpa().getId() : null,
                 film.getId()
         );
+
+        jdbc.update("DELETE FROM film_director WHERE film_id = ?", film.getId());
+
+        saveFilmDirectors(film.getId(), film.getDirectors());
 
         return film;
     }
@@ -139,6 +165,8 @@ public class FilmRepository extends BaseRepository<Film> {
             if (film.getMpa() != null) {
                 film.setMpa(getMpaById(film.getMpa().getId()));
             }
+
+            film.setDirectors(getDirectorsByFilmId(film.getId()));
         }
 
         return films;
@@ -185,6 +213,60 @@ public class FilmRepository extends BaseRepository<Film> {
                 },
                 mpaId
         );
+    }
+
+    public List<Film> findFilmsByDirectorSortedByLikes(Integer directorId) {
+        List<Film> films = jdbc.query(FIND_ALL_FILMS_BY_DIRECTOR, mapper, directorId);
+
+        // подгружаем связи
+        films.forEach(f -> {
+            f.setGenres(getGenresByFilmId(f.getId()));
+            if (f.getMpa() != null) f.setMpa(getMpaById(f.getMpa().getId()));
+            f.setDirectors(getDirectorsByFilmId(f.getId()));
+        });
+
+        return films;
+    }
+
+    public List<Film> findFilmsByDirectorSortedByYear(Integer directorId) {
+        List<Film> films = jdbc.query(FIND_ALL_FILMS_BY_YEARS, mapper, directorId);
+
+        films.forEach(f -> {
+            f.setGenres(getGenresByFilmId(f.getId()));
+            if (f.getMpa() != null) f.setMpa(getMpaById(f.getMpa().getId()));
+            f.setDirectors(getDirectorsByFilmId(f.getId()));
+        });
+
+        return films;
+    }
+
+    private Set<Director> getDirectorsByFilmId(Integer filmId) {
+        List<Director> directors = jdbc.query(
+                "SELECT d.id, d.name FROM directors d " +
+                        "JOIN film_director fd ON d.id = fd.director_id " +
+                        "WHERE fd.film_id = ?",
+                (rs, rowNum) -> {
+                    Director d = new Director();
+                    d.setId(rs.getInt("id"));
+                    d.setName(rs.getString("name"));
+                    return d;
+                },
+                filmId
+        );
+
+        return new HashSet<>(directors);
+    }
+
+    private void saveFilmDirectors(Integer filmId, Set<Director> directors) {
+        if (directors == null || directors.isEmpty()) return;
+
+        for (Director director : directors) {
+            jdbc.update(
+                    "INSERT INTO film_director (film_id, director_id) VALUES (?, ?)",
+                    filmId,
+                    director.getId()
+            );
+        }
     }
 
     public List<Film> findMostPopularsByGenreAndYear(Integer count, Long genreId, Integer year) {

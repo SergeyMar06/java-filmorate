@@ -82,8 +82,10 @@ public class UserRepository extends BaseRepository<User> {
         jdbc.update(INSERT_FRIEND, id, friendId);
     }
 
-    public void removeFromFriends(Integer id, Integer friendId) {
+    public Set<User> removeFromFriends(Integer id, Integer friendId) {
         jdbc.update(DELETE_FRIEND, id, friendId);
+
+        return getFriendsToUser(id);
     }
 
     public Set<User> getFriendsToUser(Integer id) {
