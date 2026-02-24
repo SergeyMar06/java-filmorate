@@ -29,6 +29,9 @@ public class DirectorService {
     }
 
     public Director update(Director newDirector) {
+        if (findById(newDirector.getId()) == null) {
+            throw new NotFoundException(String.format("Режиссёра с id %d нет в базе данных", newDirector.getId()));
+        }
         return directorRepository.update(newDirector);
     }
 

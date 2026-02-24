@@ -60,7 +60,7 @@ public class FilmRepository extends BaseRepository<Film> {
                     "LEFT JOIN likes l ON l.film_id = f.id " +
                     "WHERE fd.director_id = ? " +
                     "GROUP BY f.id " +
-                    "ORDER BY COUNT(l.user_id)";
+                    "ORDER BY COUNT(l.user_id) DESC";
 
 //    private static final String FIND_ALL_FILMS_BY_DIRECTOR =
 //            "SELECT f.* " +
@@ -79,7 +79,7 @@ public class FilmRepository extends BaseRepository<Film> {
                     "FROM films f " +
                     "JOIN film_director fd ON f.id = fd.film_id " +
                     "WHERE fd.director_id = ? " +
-                    "ORDER BY f.release_date DESC";
+                    "ORDER BY f.release_date";
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
