@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dal;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.InternalServerException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -37,9 +38,17 @@ public class UserRepository extends BaseRepository<User> {
                     "JOIN friendship f1 ON u.id = f1.friend_id " +
                     "JOIN friendship f2 ON u.id = f2.friend_id " +
                     "WHERE f1.user_id = ? AND f2.user_id = ?";
+    private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
+    }
+
+    public void removeUserById(int id) {
+        boolean deleted = delete(DELETE_USER_QUERY, id);
+        if (!deleted) {
+            throw new InternalServerException("Не удалось удалить пользователя");
+        }
     }
 
     public List<User> findAll() {

@@ -33,6 +33,10 @@ public class FilmService {
         this.directorRepository = directorRepository;
     }
 
+    public void removeFilm(int id) {
+        filmRepository.removeFilmById(id);
+    }
+
     public Collection<Film> findAll() {
         return filmRepository.findAll();
     }
