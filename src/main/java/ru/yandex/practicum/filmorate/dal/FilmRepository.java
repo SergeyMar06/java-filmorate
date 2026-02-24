@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dal;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -21,7 +22,7 @@ public class FilmRepository extends BaseRepository<Film> {
 
     private static final String INSERT_QUERY =
             "INSERT INTO films (name, description, release_date, duration, mpa_id)" +
-            "VALUES (?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?)";
 
     private static final String UPDATE_QUERY =
             "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ?" +
@@ -79,9 +80,14 @@ public class FilmRepository extends BaseRepository<Film> {
                     "GROUP BY f.id " +
                     "ORDER BY COUNT(l.user_id) DESC " +
                     "LIMIT :limit";
+    private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE id = ?";
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
+    }
+
+    public void removeFilmById(int id) {
+        boolean deleted = delete(DELETE_FILM_QUERY, id);
     }
 
     public List<Film> findAll() {
@@ -101,7 +107,9 @@ public class FilmRepository extends BaseRepository<Film> {
 
     public Optional<Film> findById(long filmId) {
         Optional<Film> filmOpt = findOne(FIND_BY_ID_QUERY, filmId);
-
+        if (filmOpt.isEmpty()) {
+            throw new NotFoundException("Фильм с таким id = " + filmId + " не найден");
+        }
         filmOpt.ifPresent(film -> {
             film.setGenres(getGenresByFilmId(film.getId()));
             if (film.getMpa() != null) {

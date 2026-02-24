@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS friendship(
     user_id INTEGER,
     friend_id INTEGER,
     PRIMARY KEY(user_id, friend_id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(friend_id) REFERENCES users(id)
+    FOREIGN KEY(user_id) REFERENCES users(id) ON delete CASCADE,
+    FOREIGN KEY(friend_id) REFERENCES users(id) ON delete CASCADE
 );
 
 -- таблица связи лайков
@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS likes(
     user_id INTEGER,
     film_id INTEGER,
     PRIMARY KEY(user_id, film_id),
-    FOREIGN KEY(user_id) REFERENCES users(id),
-    FOREIGN KEY(film_id) REFERENCES films(id)
+    FOREIGN KEY(user_id) REFERENCES users(id) ON delete CASCADE,
+    FOREIGN KEY(film_id) REFERENCES films(id) ON delete CASCADE
 );
 CREATE TABLE IF NOT EXISTS reviews (
     reviewId INTEGER AUTO_INCREMENT PRIMARY KEY,
@@ -70,8 +70,8 @@ CREATE TABLE IF NOT EXISTS film_genre(
     genre_id INTEGER,
     film_id INTEGER,
     PRIMARY KEY(genre_id, film_id),
-    FOREIGN KEY(genre_id) REFERENCES genres(id),
-    FOREIGN KEY(film_id) REFERENCES films(id)
+    FOREIGN KEY(genre_id) REFERENCES genres(id) ON delete CASCADE,
+    FOREIGN KEY(film_id) REFERENCES films(id) ON delete CASCADE
 );
 
 -- таблица режиссёров

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.dal;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -37,9 +38,14 @@ public class UserRepository extends BaseRepository<User> {
                     "JOIN friendship f1 ON u.id = f1.friend_id " +
                     "JOIN friendship f2 ON u.id = f2.friend_id " +
                     "WHERE f1.user_id = ? AND f2.user_id = ?";
+    private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
+    }
+
+    public void removeUserById(int id) {
+        boolean deleted = delete(DELETE_USER_QUERY, id);
     }
 
     public List<User> findAll() {
@@ -47,7 +53,11 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public Optional<User> findById(Integer userId) {
-        return findOne(FIND_BY_ID_QUERY, userId);
+        Optional<User> optUser = findOne(FIND_BY_ID_QUERY, userId);
+        if (optUser.isEmpty()) {
+            throw new NotFoundException("User с таким id = " + userId + " не найден");
+        }
+        return optUser;
     }
 
     public User save(User user) {
