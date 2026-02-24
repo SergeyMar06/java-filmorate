@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.DirectorRepository;
 import ru.yandex.practicum.filmorate.dal.FilmRepository;
@@ -43,9 +44,7 @@ public class FilmService {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new BadRequestException("Название фильма не может быть пустым");
         }
-//        if (film.getDescription() == null || film.getDescription().length() > 200) {
-//            throw new BadRequestException("Описание слишком длинное");
-//        }
+
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new BadRequestException("Неверная дата релиза");
         }
@@ -126,6 +125,8 @@ public class FilmService {
         } else {
             throw new IllegalArgumentException("Unknown sortBy value: " + sortBy);
         }
+    }
+
     public List<Film> getCommonSortedFilms(Integer userId, Integer friendId) {
         return filmRepository.getCommonSortedFilms(userId, friendId);
     }
