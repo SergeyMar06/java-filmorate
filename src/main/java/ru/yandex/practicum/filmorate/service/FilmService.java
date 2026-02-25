@@ -152,7 +152,7 @@ public class FilmService {
         String[] result = by.split(",");
 
         if (result.length == 2) {
-            return null;
+            return filmRepository.findByTitleAndDirector(query);
         } else if (result[0].equals("title")) {
             return filmRepository.findByTitle(query);
         } else if (result[0].equals("director")) {
