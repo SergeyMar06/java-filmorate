@@ -57,7 +57,7 @@ public class ReviewRepository extends ru.yandex.practicum.filmorate.dal.BaseRepo
         );
     }
 
-    public void save(Review review) {
+    public int save(Review review) {
         int id = Math.toIntExact(insert(
                 INSERT_QUERY,
                 review.getContent(),
@@ -66,6 +66,7 @@ public class ReviewRepository extends ru.yandex.practicum.filmorate.dal.BaseRepo
                 review.getIsPositive()
         ));
         review.setReviewId(id);
+        return id;
     }
 
     public void deleteReview(int reviewId) {
