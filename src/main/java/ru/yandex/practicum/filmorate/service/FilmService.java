@@ -154,9 +154,9 @@ public class FilmService {
         if (result.length == 2) {
             return null;
         } else if (result[0].equals("title")) {
-            return filmRepository.findByTitle(result[0]);
+            return filmRepository.findByTitle(query);
         } else if (result[0].equals("director")) {
-            return null;
-        } else throw new BadRequestException("Неверно указаны параметры параметры строки запроса");
+            return filmRepository.findByDirector(query);
+        } else throw new BadRequestException("Неверно указаны параметры строки запроса");
     }
 }

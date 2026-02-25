@@ -85,9 +85,15 @@ public class FilmRepository extends BaseRepository<Film> {
 
     private static final String FIND_FILM_BY_TITLE =
             "SELECT f.* " +
-                    "FROM films f" +
+                    "FROM films f " +
                     "WHERE f.name ILIKE '%?%';";
 
+    private static final String FIND_FILM_BY_DIRECTOR =
+            "SELECT f.* " +
+                    "FROM films f " +
+                    "LEFT JOIN film_director AS fd ON f.id = fd.film_id " +
+                    "LEFT JOIN directors AS d ON fd.director_id = d.id " +
+                    "WHERE d.name ILIKE '%?%';";
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
     }
@@ -330,6 +336,19 @@ public class FilmRepository extends BaseRepository<Film> {
 
     public List<Film> findByTitle(String title) {
         List<Film> films = jdbc.query(FIND_FILM_BY_TITLE, mapper, title);
+
+        for (Film film : films) {
+            film.setGenres(getGenresByFilmId(film.getId()));
+            if (film.getMpa() != null) {
+                film.setMpa(getMpaById(film.getMpa().getId()));
+            }
+        }
+
+        return films;
+    }
+
+    public List<Film> findByDirector(String director) {
+        List<Film> films = jdbc.query(FIND_FILM_BY_DIRECTOR, mapper, director);
 
         for (Film film : films) {
             film.setGenres(getGenresByFilmId(film.getId()));
