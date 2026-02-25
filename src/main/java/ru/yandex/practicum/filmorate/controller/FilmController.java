@@ -82,4 +82,10 @@ public class FilmController {
                                             @RequestParam("sortBy") String sortBy) {
         return filmService.findAllFilmByDirector(directorId, sortBy);
     }
+
+    @GetMapping("/search")
+    public List<Film> findByTitleOrDirector(@RequestParam("query") String query,
+                                            @RequestParam("by") String by) {
+        return filmService.findByTitleOrDirector(query, by);
+    }
 }
