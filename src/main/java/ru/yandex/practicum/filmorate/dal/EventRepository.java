@@ -12,8 +12,8 @@ import java.util.List;
 @Repository
 public class EventRepository extends BaseRepository<Event> {
     private static final String FIND_ALL_QUERY = "SELECT * FROM events WHERE userId = ?";
-    private static final String INSERT_QUERY = "INSERT INTO events (userId, eventType, operation, entityId)" +
-            "VALUES (?, ?, ?, ?)";
+    private static final String INSERT_QUERY = "INSERT INTO events (userId, eventType, operation, entityId, timestamp) " +
+            "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)";
 
     public EventRepository(JdbcTemplate jdbc, RowMapper<Event> mapper) {
         super(jdbc, mapper);
