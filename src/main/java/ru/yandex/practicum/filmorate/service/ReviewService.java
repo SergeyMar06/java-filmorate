@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import ru.yandex.practicum.filmorate.dal.EventRepository;
 import ru.yandex.practicum.filmorate.dal.ReviewLikeRepository;
 import ru.yandex.practicum.filmorate.dal.ReviewRepository;
-import ru.yandex.practicum.filmorate.model.Review;
-import ru.yandex.practicum.filmorate.model.ReviewLike;
+import ru.yandex.practicum.filmorate.model.*;
 
 import java.util.List;
 
@@ -20,6 +20,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final UserService userService;
     private final FilmService filmService;
+    private final EventRepository eventRepository;
 
     public void addReview(Review review) {
         if (!validateReview(review)) {
@@ -30,7 +31,13 @@ public class ReviewService {
             userService.findById(review.getUserId()); // проверка на существование User с таким id
             filmService.findById(review.getFilmId()); // проверка на существование Film с таким id. если не найдет возникнет ошибка 404
             log.info("Валидация review {} прошла успешно", review);
-            reviewRepository.save(review);
+            Integer revId = reviewRepository.save(review);
+            Event event = new Event(); // добавление в ленту
+            event.setEventType(EventType.REVIEW.toString());
+            event.setUserId(review.getUserId()); // актор
+            event.setEntityId(revId); // как узнать reviewId???
+            event.setOperation(Operation.ADD.toString());
+            eventRepository.save(event); // добавление в ленту
         }
     }
 
@@ -40,6 +47,12 @@ public class ReviewService {
             throw new ValidationException("некорректно заполнены поля");
         } else {
             reviewRepository.update(review);
+            Event event = new Event(); // добавление в ленту
+            event.setEventType(EventType.REVIEW.toString());
+            event.setUserId(review.getUserId()); // актор
+            event.setEntityId(review.getReviewId());
+            event.setOperation(Operation.UPDATE.toString());
+            eventRepository.save(event); // добавление в ленту
         }
     }
 
@@ -57,6 +70,12 @@ public class ReviewService {
 
     public void removeReview(int id) {
         reviewRepository.deleteReview(id);
+        Event event = new Event(); // добавление в ленту
+        event.setEventType(EventType.REVIEW.toString());
+        event.setUserId(getReviewByReviewId(id).getUserId()); // актор
+        event.setEntityId(id);
+        event.setOperation(Operation.REMOVE.toString());
+        eventRepository.save(event); // добавление в ленту
     }
 
     public void addReviewLike(int reviewId, int userId) {
@@ -68,6 +87,12 @@ public class ReviewService {
 
         if (reviewLikeRepository.addLikeOrDislike(reviewLike)) { // если лайк добавлен, увеличиваем значение поля useful на 1
             reviewRepository.increaseUseful(reviewId);
+            Event event = new Event(); // добавление в ленту
+            event.setEventType(EventType.LIKE.toString());
+            event.setUserId(userId); // актор
+            event.setEntityId(reviewId);
+            event.setOperation(Operation.ADD.toString());
+            eventRepository.save(event); // добавление в ленту
         }
     }
 
@@ -80,6 +105,12 @@ public class ReviewService {
 
         if (reviewLikeRepository.addLikeOrDislike(reviewLike)) { // если лайк добавлен, увеличиваем значение поля useful на 1
             reviewRepository.decreaseUseful(reviewId);
+            Event event = new Event(); // добавление в ленту
+            event.setEventType(EventType.LIKE.toString());
+            event.setUserId(userId); // действующее лицо
+            event.setEntityId(reviewId);
+            event.setOperation(Operation.ADD.toString());
+            eventRepository.save(event); // добавление в ленту
         }
     }
 
@@ -90,6 +121,12 @@ public class ReviewService {
         reviewLike.setUserId(userId);
         if (reviewLikeRepository.deleteLikeOrDislike(reviewLike)) {
             reviewRepository.decreaseUseful(reviewId); // при удалении лайка уменьшаем useful на 1
+            Event event = new Event(); // добавление в ленту
+            event.setEventType(EventType.LIKE.toString());
+            event.setUserId(userId);
+            event.setEntityId(reviewId);
+            event.setOperation(Operation.REMOVE.toString());
+            eventRepository.save(event); // добавление в ленту
         }
     }
 
@@ -100,6 +137,12 @@ public class ReviewService {
         reviewLike.setUserId(userId);
         if (reviewLikeRepository.deleteLikeOrDislike(reviewLike)) {
             reviewRepository.increaseUseful(reviewId); // при удалении дизлайка useful +1
+            Event event = new Event(); // добавление в ленту
+            event.setEventType(EventType.LIKE.toString());
+            event.setUserId(userId);
+            event.setEntityId(reviewId);
+            event.setOperation(Operation.REMOVE.toString());
+            eventRepository.save(event); // добавление в ленту
         }
     }
 

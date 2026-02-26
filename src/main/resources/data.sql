@@ -7,6 +7,7 @@ DELETE FROM friendship;
 DELETE FROM users;
 DELETE FROM genres;
 DELETE FROM reviews;
+DELETE FROM events;
 DELETE FROM reviewLikes;
 
 ALTER TABLE users ALTER COLUMN id RESTART WITH 1;

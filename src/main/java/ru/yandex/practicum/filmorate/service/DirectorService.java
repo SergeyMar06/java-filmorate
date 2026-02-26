@@ -1,5 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.DirectorRepository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -7,13 +9,11 @@ import ru.yandex.practicum.filmorate.model.Director;
 
 import java.util.List;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class DirectorService {
-    private DirectorRepository directorRepository;
-
-    public DirectorService(DirectorRepository directorRepository) {
-        this.directorRepository = directorRepository;
-    }
+    private final DirectorRepository directorRepository;
 
     public List<Director> findAll() {
         return directorRepository.findAll();

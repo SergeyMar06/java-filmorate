@@ -1,9 +1,15 @@
 package ru.yandex.practicum.filmorate.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.EventRepository;
 import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Event;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
@@ -11,13 +17,17 @@ import java.util.Optional;
 import java.util.Set;
 
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final EventRepository eventRepository;
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
+
+    public Collection<Event> getAllEventsByUserId(int userId) {
+        return eventRepository.findAll(userId);
     }
 
     public void removeUser(int id) {
@@ -65,6 +75,14 @@ public class UserService {
         }
 
         userRepository.addFriend(id, friendId);
+        log.info("User {} add user {} в друзья", id, friendId);
+        Event event = new Event(); // добавление в ленту
+        event.setEventType(EventType.FRIEND.toString());
+        event.setUserId(id); // актор добавил в друзья
+        event.setEntityId(friendId);
+        event.setOperation(Operation.ADD.toString());
+        log.info("event внутри userService =" + event);
+        eventRepository.save(event); // добавление в ленту
     }
 
     public Set<User> removeFromFriends(Integer id, Integer friendId) {
@@ -74,7 +92,12 @@ public class UserService {
         if (userRepository.findById(friendId).isEmpty()) {
             throw new NotFoundException("Пользователя с id = " + friendId + " нет");
         }
-
+        Event event = new Event(); // добавление в ленту
+        event.setEventType(EventType.FRIEND.toString());
+        event.setUserId(id); // актор удалил из друзей
+        event.setEntityId(friendId); // кого удалил
+        event.setOperation(Operation.REMOVE.toString());
+        eventRepository.save(event); // добавление в ленту
         return userRepository.removeFromFriends(id, friendId);
     }
 
