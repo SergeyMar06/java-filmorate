@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,10 +9,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.*;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.EventType;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Operation;
+import ru.yandex.practicum.filmorate.model.*;
 
 @Slf4j
 @Service
@@ -60,6 +55,10 @@ public class FilmService {
         film = filmRepository.save(film);
 
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            List<Genre> g = film.getGenres();
+            LinkedHashSet<Genre> uniqueGenres = new LinkedHashSet<>(g);
+            List<Genre> genres = new ArrayList<>(uniqueGenres);
+            film.setGenres(genres);
             genreRepository.addGenre(film);
         }
 
@@ -72,10 +71,12 @@ public class FilmService {
         }
 
         newFilm = filmRepository.update(newFilm);
+        List<Genre> g = newFilm.getGenres();
+        LinkedHashSet<Genre> uniqueGenres = new LinkedHashSet<>(g);
+        List<Genre> genres = new ArrayList<>(uniqueGenres);
+        newFilm.setGenres(genres);
+        genreRepository.updateGenre(newFilm);
 
-        if (newFilm.getGenres() != null && !newFilm.getGenres().isEmpty()) {
-            genreRepository.updateGenre(newFilm);
-        }
 
         return newFilm;
     }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dal.DirectorRepository;
+import ru.yandex.practicum.filmorate.exception.InvalidFormatException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 
@@ -25,6 +26,9 @@ public class DirectorService {
     }
 
     public Director create(Director director) {
+        if (director.getName().isBlank()) {
+            throw new InvalidFormatException("Некорректное имя режисера");
+        }
         return directorRepository.save(director);
     }
 

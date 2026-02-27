@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import java.util.Collection;
 
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +38,7 @@ public class ReviewController {
     public Review getReview(@PathVariable("id") int id) {
         return reviewService.getReviewByReviewId(id);
     }
+
 
     @GetMapping("/reviews")
     public Collection<Review> getPopularReviews(@RequestParam(value = "filmId", required = false) Integer filmId,

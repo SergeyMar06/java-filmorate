@@ -1,9 +1,7 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -159,8 +157,9 @@ public class FilmRepository extends BaseRepository<Film> {
         return films;
     }
 
-    private Set<Genre> getGenresByFilmId(Integer filmId) {
-        List<Genre> genres = jdbc.query(
+    private List<Genre> getGenresByFilmId(Integer filmId) {
+        List<Genre> genres = new ArrayList<>();
+        genres = jdbc.query(
                 "SELECT g.id, g.name FROM genres g " + "JOIN film_genre fg ON g.id = fg.genre_id "
                         + "WHERE fg.film_id = ? ORDER BY g.id", (rs, rowNum) -> {
                     Genre genre = new Genre();
@@ -169,7 +168,7 @@ public class FilmRepository extends BaseRepository<Film> {
                     return genre;
                 }, filmId);
 
-        return new HashSet<>(genres);
+        return genres;
     }
 
     private Mpa getMpaById(Long mpaId) {
@@ -210,7 +209,7 @@ public class FilmRepository extends BaseRepository<Film> {
         return films;
     }
 
-    private Set<Director> getDirectorsByFilmId(Integer filmId) {
+    private List<Director> getDirectorsByFilmId(Integer filmId) {
         List<Director> directors = jdbc.query(
                 "SELECT d.id, d.name FROM directors d " + "JOIN film_director fd ON d.id = fd.director_id "
                         + "WHERE fd.film_id = ?", (rs, rowNum) -> {
@@ -220,10 +219,10 @@ public class FilmRepository extends BaseRepository<Film> {
                     return d;
                 }, filmId);
 
-        return new HashSet<>(directors);
+        return directors;
     }
 
-    private void saveFilmDirectors(Integer filmId, Set<Director> directors) {
+    private void saveFilmDirectors(Integer filmId, List<Director> directors) {
         if (directors == null || directors.isEmpty()) {
             return;
         }

@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.model.Genre;
 import java.util.List;
 import java.util.Optional;
 
+
 @Repository
 public class GenreRepository extends BaseRepository<Genre> {
     private static final String FIND_ALL_QUERY = "SELECT * FROM genres";
@@ -43,8 +44,8 @@ public class GenreRepository extends BaseRepository<Genre> {
     }
 
     public void updateGenre(Film film) {
-        jdbc.update(DELETE_FILM_GENRES, film.getId());
-
+        delete(DELETE_FILM_GENRES, film.getId());
         addGenre(film);
     }
 }
+

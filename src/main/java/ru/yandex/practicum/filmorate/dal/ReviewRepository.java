@@ -23,6 +23,7 @@ public class ReviewRepository extends ru.yandex.practicum.filmorate.dal.BaseRepo
     private static final String UPDATE_USEFUL_QUERY = "UPDATE reviews SET useful = useful + 1 WHERE reviewId = ?";
     private static final String DECREASE_USEFUL_QUERY = "UPDATE reviews SET useful = useful - 1 WHERE reviewId = ?";
 
+
     public ReviewRepository(JdbcTemplate jdbc, RowMapper<Review> mapper) {
         super(jdbc, mapper);
 
