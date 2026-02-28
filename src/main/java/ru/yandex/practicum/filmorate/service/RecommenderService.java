@@ -10,9 +10,7 @@ import ru.yandex.practicum.filmorate.model.PairOfUsersWithCommonInterests;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -25,7 +23,7 @@ public class RecommenderService {
         Collection<PairOfUsersWithCommonInterests> pairs = getPairsOfUsersWithCommonInterests(targetUserId);
 
         // Набор фильмов для рекомендаций
-        Set<Film> recommendedMovies = new HashSet<>();
+        List<Film> recommendedMovies = new ArrayList<>();
 
         // Проходим по каждой паре пользователей
         for (PairOfUsersWithCommonInterests pair : pairs) {
@@ -90,6 +88,6 @@ public class RecommenderService {
                         rs.getInt("common_likes_count")
                 );
 
-        return new HashSet<>(jdbc.query(sql, mapper, targetUserId, targetUserId));
+        return new ArrayList<>(jdbc.query(sql, mapper, targetUserId, targetUserId));
     }
 }

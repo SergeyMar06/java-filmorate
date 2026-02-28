@@ -26,7 +26,7 @@ public class ReviewController {
     @PutMapping("/reviews")
     public Review update(@RequestBody Review review) {
         reviewService.updateReview(review);
-        return review;
+        return reviewService.getReviewByReviewId(review.getReviewId());
     }
 
     @DeleteMapping("/reviews/{id}")
@@ -42,10 +42,15 @@ public class ReviewController {
 
     @GetMapping("/reviews")
     public Collection<Review> getPopularReviews(@RequestParam(value = "filmId", required = false) Integer filmId,
-                                                @RequestParam(value = "count", defaultValue = "10") int count) {
-        if (filmId == null) {
+                                                @RequestParam(value = "count", required = false) Integer count) {
+        if (filmId == null && count == null) { // возвращаем все отзывы+++
+            return reviewService.getAllRev();
+        } else if (filmId == null) {
             return reviewService.getAllReviews(count);
+        } else if (count != null) {
+            return reviewService.getReviewsByFilmId(filmId, count);
         } else {
+            count = 10;
             return reviewService.getReviewsByFilmId(filmId, count);
 
         }

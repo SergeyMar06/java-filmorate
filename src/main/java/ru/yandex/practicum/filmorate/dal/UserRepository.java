@@ -8,7 +8,7 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
+
 
 @Repository
 public class UserRepository extends BaseRepository<User> {
@@ -92,23 +92,23 @@ public class UserRepository extends BaseRepository<User> {
         jdbc.update(INSERT_FRIEND, id, friendId);
     }
 
-    public Set<User> removeFromFriends(Integer id, Integer friendId) {
+    public List<User> removeFromFriends(Integer id, Integer friendId) {
         jdbc.update(DELETE_FRIEND, id, friendId);
 
         return getFriendsToUser(id);
     }
 
-    public Set<User> getFriendsToUser(Integer id) {
+    public List<User> getFriendsToUser(Integer id) {
         List<User> friends = jdbc.query(
                 FIND_FRIENDS,
                 mapper,
                 id
         );
 
-        return Set.copyOf(friends);
+        return List.copyOf(friends);
     }
 
-    public Set<User> getFriendsCommonOtherFriend(Integer id, Integer friendId) {
+    public List<User> getFriendsCommonOtherFriend(Integer id, Integer friendId) {
         List<User> commonFriends = jdbc.query(
                 FIND_COMMON_FRIENDS,
                 mapper,
@@ -116,6 +116,6 @@ public class UserRepository extends BaseRepository<User> {
                 friendId
         );
 
-        return Set.copyOf(commonFriends);
+        return List.copyOf(commonFriends);
     }
 }

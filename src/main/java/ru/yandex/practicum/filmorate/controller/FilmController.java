@@ -86,6 +86,6 @@ public class FilmController {
     @GetMapping("/search")
     public List<Film> findByTitleOrDirector(@RequestParam("query") String query,
                                             @RequestParam("by") String by) {
-        return filmService.findByTitleOrDirector(query, by);
+        return filmService.findByTitleOrDirector(query, by.toLowerCase()); // ????
     }
 }

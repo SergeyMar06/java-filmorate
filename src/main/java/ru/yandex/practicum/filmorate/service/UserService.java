@@ -13,8 +13,8 @@ import ru.yandex.practicum.filmorate.model.Operation;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 @Slf4j
@@ -27,6 +27,9 @@ public class UserService {
 
 
     public Collection<Event> getAllEventsByUserId(int userId) {
+        if (findById(userId).isEmpty()) {
+            throw new NotFoundException("Пользователя с таким id не существует");
+        }
         return eventRepository.findAll(userId);
     }
 
@@ -85,7 +88,7 @@ public class UserService {
         eventRepository.save(event); // добавление в ленту
     }
 
-    public Set<User> removeFromFriends(Integer id, Integer friendId) {
+    public List<User> removeFromFriends(Integer id, Integer friendId) {
         if (userRepository.findById(id).isEmpty()) {
             throw new NotFoundException("Пользователя с id = " + id + " нет");
         }
@@ -101,14 +104,14 @@ public class UserService {
         return userRepository.removeFromFriends(id, friendId);
     }
 
-    public Set<User> getFriendsToUser(Integer id) {
+    public List<User> getFriendsToUser(Integer id) {
         if (userRepository.findById(id).isEmpty()) {
             throw new NotFoundException("Пользователя с id = " + id + " нет");
         }
         return userRepository.getFriendsToUser(id);
     }
 
-    public Set<User> getFriendsCommonOtherFriend(Integer id, Integer friendId) {
+    public List<User> getFriendsCommonOtherFriend(Integer id, Integer friendId) {
         return userRepository.getFriendsCommonOtherFriend(id, friendId);
     }
 }

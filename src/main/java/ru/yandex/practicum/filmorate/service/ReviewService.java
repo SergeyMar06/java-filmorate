@@ -22,6 +22,10 @@ public class ReviewService {
     private final FilmService filmService;
     private final EventRepository eventRepository;
 
+    public List<Review> getAllRev() {
+        return reviewRepository.getAllRev();
+    }
+
     public void addReview(Review review) {
         if (!validateReview(review)) {
             log.error("некорректно заполнены поля");

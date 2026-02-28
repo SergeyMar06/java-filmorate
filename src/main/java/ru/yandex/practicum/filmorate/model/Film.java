@@ -7,9 +7,8 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
 
 /**
  * Film.
@@ -24,7 +23,7 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private Integer duration;
-    private Set<Long> usersLikesFilm = new HashSet<>();
+    private List<Long> usersLikesFilm = new ArrayList<>();
     private List<Genre> genres = new ArrayList<>();
     private Mpa mpa;
     private List<Director> directors = new ArrayList<>();
