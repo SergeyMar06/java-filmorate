@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,7 +48,7 @@ public class FilmController {
     }
 
     @GetMapping("/{id}")
-    public Optional<Film> findById(@PathVariable Integer id) {
+    public Film findById(@PathVariable Integer id) {
         return filmService.findById(id);
     }
 

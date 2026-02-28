@@ -20,7 +20,7 @@ public class RecommenderController {
     }
 
     @GetMapping("/{id}/recommendations")
-    public Collection<Film> getRecommendateFilms(@PathVariable Integer id) throws SQLException {
+    public Collection<Film> getRecommendedFilms(@PathVariable Integer id) throws SQLException {
         return recommenderService.getRecommendedMoviesForUser(id); //возвращаем список фильмов
     }
 }

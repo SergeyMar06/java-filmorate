@@ -18,14 +18,12 @@ public class ReviewController {
     @PostMapping("/reviews")
     public Review create(@RequestBody Review review) {
         log.info("Полученный отзыв: " + review.toString());
-        reviewService.addReview(review);
-        return review;
+        return reviewService.addReview(review);
     }
 
     @PutMapping("/reviews")
     public Review update(@RequestBody Review review) {
-        reviewService.updateReview(review);
-        return review;
+        return reviewService.updateReview(review);
     }
 
     @DeleteMapping("/reviews/{id}")

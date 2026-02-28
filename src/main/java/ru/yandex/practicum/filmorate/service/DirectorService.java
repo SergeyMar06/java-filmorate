@@ -25,12 +25,18 @@ public class DirectorService {
     }
 
     public Director create(Director director) {
+        if (director.getName() == null || director.getName().isBlank()) {
+            throw new IllegalArgumentException("Имя режиссёра не может быть пустым");
+        }
+
         return directorRepository.save(director);
     }
 
     public Director update(Director newDirector) {
-        if (findById(newDirector.getId()) == null) {
-            throw new NotFoundException(String.format("Режиссёра с id %d нет в базе данных", newDirector.getId()));
+        findById(newDirector.getId());
+
+        if (newDirector.getName() == null || newDirector.getName().isBlank()) {
+            throw new IllegalArgumentException("Имя режиссёра не может быть пустым");
         }
         return directorRepository.update(newDirector);
     }

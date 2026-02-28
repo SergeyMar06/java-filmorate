@@ -31,5 +31,3 @@ public class ReviewLikeRepository extends ru.yandex.practicum.filmorate.dal.Base
         return delete(DELETE_LIKE_QUERY, reviewLike.getReviewId(), reviewLike.getUserId(), reviewLike.isLike());
     }
 }
-
-
