@@ -30,8 +30,8 @@ public class BaseRepository<T> {
         return jdbc.query(query, mapper, params);
     }
 
-    protected boolean delete(String query, long id) {
-        int rowsDeleted = jdbc.update(query, id);
+    protected boolean delete(String query, Object... params) { // чтобы разное количество параметров принимал
+        int rowsDeleted = jdbc.update(query, params);
         return rowsDeleted > 0;
     }
 
