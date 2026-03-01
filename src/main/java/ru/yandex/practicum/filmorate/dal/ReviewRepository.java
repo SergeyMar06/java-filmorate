@@ -15,10 +15,10 @@ import java.util.Optional;
 @Repository
 public class ReviewRepository extends ru.yandex.practicum.filmorate.dal.BaseRepository<Review> {
     private static final String FIND_REVIEW_BY_ID_QUERY = "SELECT * FROM reviews WHERE reviewId = ?";
-    private static final String FIND_ALL_QUERY = "SELECT * FROM reviews ORDER BY useful DESC LIMIT ?";
+    private static final String FIND_ALL_QUERY = "SELECT * FROM reviews ORDER BY useful DESC LIMIT :count;";
     private static final String FIND_ALL_QUERY_BY_FILM_ID = "SELECT * FROM reviews WHERE filmId = ? ORDER BY useful DESC FETCH FIRST ? ROWS ONLY";
     private static final String DELETE_REVIEW_QUERY = "DELETE FROM reviews WHERE reviewId = ?";
-    private static final String UPDATE_REVIEW_BY_ID_QUERY = "UPDATE reviews SET content = ?, isPositive = ? WHERE reviewId = ?";
+    private static final String UPDATE_REVIEW_BY_ID_QUERY = "UPDATE reviews SET content = ?, filmId = ?, userId = ?, isPositive = ? WHERE reviewId = ?";
     private static final String INSERT_QUERY = "INSERT INTO reviews(content, filmId, userId, isPositive) VALUES (?, ?, ?, ?)"; // useful по умолчанию 0
     private static final String UPDATE_USEFUL_QUERY = "UPDATE reviews SET useful = useful + 1 WHERE reviewId = ?";
     private static final String DECREASE_USEFUL_QUERY = "UPDATE reviews SET useful = useful - 1 WHERE reviewId = ?";
@@ -50,19 +50,23 @@ public class ReviewRepository extends ru.yandex.practicum.filmorate.dal.BaseRepo
         update(
                 UPDATE_REVIEW_BY_ID_QUERY,
                 review.getContent(),
+                review.getFilmId(),
+                review.getUserId(),
                 review.getIsPositive(),
                 review.getReviewId()
         );
     }
 
     public Integer save(Review review) {
-        return insert(
+        int id = Math.toIntExact(insert(
                 INSERT_QUERY,
                 review.getContent(),
                 review.getFilmId(),
                 review.getUserId(),
                 review.getIsPositive()
-        );
+        ));
+        review.setReviewId(id);
+        return id;
     }
 
     public void deleteReview(int reviewId) {
