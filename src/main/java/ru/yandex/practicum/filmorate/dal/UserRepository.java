@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.dal;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -83,11 +82,8 @@ public class UserRepository extends BaseRepository<User> {
         jdbc.update(INSERT_FRIEND, id, friendId);
     }
 
-    public User removeFromFriends(Integer id, Integer friendId) {
+    public void removeFromFriends(Integer id, Integer friendId) {
         jdbc.update(DELETE_FRIEND, id, friendId);
-
-        return findOne(FIND_BY_ID_QUERY, friendId)
-                .orElseThrow(() -> new NotFoundException("Пользователя с id = " + friendId + " нет"));
     }
 
     public Set<User> getFriendsToUser(Integer id) {
