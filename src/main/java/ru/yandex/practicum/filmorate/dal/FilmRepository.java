@@ -80,13 +80,7 @@ public class FilmRepository extends BaseRepository<Film> {
                     "GROUP BY f.id " +
                     "ORDER BY COUNT(l.user_id) DESC " +
                     "LIMIT :limit";
-
     private static final String DELETE_FILM_QUERY = "DELETE FROM films WHERE id = ?";
-
-    private static final String FIND_FILM_BY_TITLE =
-            "SELECT f.* " +
-                    "FROM films f" +
-                    "WHERE f.name ILIKE '%?%';";
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -317,19 +311,6 @@ public class FilmRepository extends BaseRepository<Film> {
         } else {
             return findMostLikedFilms(count);
         }
-
-        for (Film film : films) {
-            film.setGenres(getGenresByFilmId(film.getId()));
-            if (film.getMpa() != null) {
-                film.setMpa(getMpaById(film.getMpa().getId()));
-            }
-        }
-
-        return films;
-    }
-
-    public List<Film> findByTitle(String title) {
-        List<Film> films = jdbc.query(FIND_FILM_BY_TITLE, mapper, title);
 
         for (Film film : films) {
             film.setGenres(getGenresByFilmId(film.getId()));
