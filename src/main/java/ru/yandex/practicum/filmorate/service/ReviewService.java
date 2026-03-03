@@ -69,11 +69,10 @@ public class ReviewService {
     }
 
     public void removeReview(int id) {
-        Integer userIdIInReview = getReviewByReviewId(id).getUserId();
         reviewRepository.deleteReview(id);
         Event event = new Event(); // добавление в ленту
         event.setEventType(EventType.REVIEW.toString());
-        event.setUserId(userIdIInReview); // актор
+        event.setUserId(getReviewByReviewId(id).getUserId()); // актор
         event.setEntityId(id);
         event.setOperation(Operation.REMOVE.toString());
         eventRepository.save(event); // добавление в ленту
