@@ -28,7 +28,7 @@ public class DirectorRepository extends BaseRepository<Director> {
         return findMany(FIND_ALL_QUERY);
     }
 
-    public Optional<Director> findById(Integer id) {
+    public Optional<Director> findById(Long id) {
         return findOne(FIND_BY_ID_QUERY, id);
     }
 
@@ -53,7 +53,7 @@ public class DirectorRepository extends BaseRepository<Director> {
         return newDirector;
     }
 
-    public void delete(Integer id) {
+    public void delete(Long id) {
         delete(DELETE_QUERY, id);
     }
 }

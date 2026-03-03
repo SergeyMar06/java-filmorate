@@ -83,10 +83,11 @@ public class UserRepository extends BaseRepository<User> {
         jdbc.update(INSERT_FRIEND, id, friendId);
     }
 
-    public Set<User> removeFromFriends(Integer id, Integer friendId) {
+    public User removeFromFriends(Integer id, Integer friendId) {
         jdbc.update(DELETE_FRIEND, id, friendId);
 
-        return getFriendsToUser(id);
+        return findOne(FIND_BY_ID_QUERY, id)
+                .orElseThrow(() -> new NotFoundException("Пользователя с id = " + id + " нет"));
     }
 
     public Set<User> getFriendsToUser(Integer id) {

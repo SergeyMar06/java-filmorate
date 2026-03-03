@@ -19,7 +19,7 @@ public class DirectorService {
         return directorRepository.findAll();
     }
 
-    public Director findById(Integer id) {
+    public Director findById(Long id) {
         return directorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Director not found"));
     }
@@ -32,7 +32,7 @@ public class DirectorService {
         return directorRepository.update(newDirector);
     }
 
-    public void delete(Integer id) {
+    public void delete(Long id) {
         directorRepository.delete(id);
     }
 }

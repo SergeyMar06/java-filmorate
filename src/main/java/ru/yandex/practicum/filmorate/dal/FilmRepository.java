@@ -54,13 +54,16 @@ public class FilmRepository extends BaseRepository<Film> {
 //                    "ORDER BY likes_count DESC";
 
     private static final String FIND_ALL_FILMS_BY_DIRECTOR =
-            "SELECT f.* " +
+            "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id " +
                     "FROM films f " +
                     "JOIN film_director fd ON f.id = fd.film_id " +
-                    "LEFT JOIN likes l ON l.film_id = f.id " +
+                    "LEFT JOIN ( " +
+                    "   SELECT film_id, COUNT(user_id) AS likes_count " +
+                    "   FROM likes " +
+                    "   GROUP BY film_id " +
+                    ") l ON f.id = l.film_id " +
                     "WHERE fd.director_id = ? " +
-                    "GROUP BY f.id " +
-                    "ORDER BY COUNT(l.user_id)";
+                    "ORDER BY COALESCE(l.likes_count, 0) DESC";
 
 //    private static final String FIND_ALL_FILMS_BY_DIRECTOR =
 //            "SELECT f.* " +
@@ -120,6 +123,7 @@ public class FilmRepository extends BaseRepository<Film> {
                 INSERT_QUERY,
                 film.getName(),
                 film.getDescription(),
+//                film.getReleaseDate(),
                 film.getReleaseDate() != null ? java.sql.Date.valueOf(film.getReleaseDate()) : null,
                 film.getDuration(),
                 film.getMpa() != null ? film.getMpa().getId() : null
@@ -137,7 +141,7 @@ public class FilmRepository extends BaseRepository<Film> {
                 UPDATE_QUERY,
                 film.getName(),
                 film.getDescription(),
-                film.getReleaseDate() != null ? java.sql.Date.valueOf(film.getReleaseDate()) : null,
+                film.getReleaseDate(),
                 film.getDuration(),
                 film.getMpa() != null ? film.getMpa().getId() : null,
                 film.getId()

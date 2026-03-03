@@ -21,7 +21,7 @@ public class DirectorController {
     }
 
     @GetMapping("/{id}")
-    public Director findById(@PathVariable Integer id) {
+    public Director findById(@PathVariable Long id) {
         return directorService.findById(id);
     }
 
@@ -36,7 +36,7 @@ public class DirectorController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
+    public void delete(@PathVariable Long id) {
         directorService.delete(id);
     }
 }
