@@ -87,7 +87,7 @@ public class UserRepository extends BaseRepository<User> {
         jdbc.update(DELETE_FRIEND, id, friendId);
 
         return findOne(FIND_BY_ID_QUERY, id)
-                .orElseThrow(() -> new NotFoundException("Пользователя с id = " + id + " нет"));
+                .orElseThrow(() -> new NotFoundException("Пользователя с id = " + friendId + " нет"));
     }
 
     public Set<User> getFriendsToUser(Integer id) {
