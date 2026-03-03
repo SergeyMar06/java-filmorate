@@ -53,28 +53,16 @@ public class FilmRepository extends BaseRepository<Film> {
 //                    "GROUP BY f.id " +
 //                    "ORDER BY likes_count DESC";
 
-//    private static final String FIND_ALL_FILMS_BY_DIRECTOR =
-//            "SELECT f.* " +
-//                    "FROM films f " +
-//                    "JOIN film_director fd ON f.id = fd.film_id " +
-//                    "LEFT JOIN (" +
-//                    "    SELECT film_id, COUNT(user_id) AS likes_count " +
-//                    "    FROM likes " +
-//                    "    GROUP BY film_id" +
-//                    ") l ON f.id = l.film_id " +
-//                    "WHERE fd.director_id = ? " +
-//                    "ORDER BY COALESCE(l.likes_count, 0) DESC";
-
     private static final String FIND_ALL_FILMS_BY_DIRECTOR =
-            "SELECT f.id, f.name, f.description, f.release_date, f.duration, f.mpa_id\n" +
-                    "FROM films f\n" +
-                    "JOIN film_director fd ON f.id = fd.film_id\n" +
-                    "LEFT JOIN (\n" +
-                    "    SELECT film_id, COUNT(user_id) AS likes_count\n" +
-                    "    FROM likes\n" +
-                    "    GROUP BY film_id\n" +
-                    ") l ON f.id = l.film_id\n" +
-                    "WHERE fd.director_id = ?\n" +
+            "SELECT f.* " +
+                    "FROM films f " +
+                    "JOIN film_director fd ON f.id = fd.film_id " +
+                    "LEFT JOIN (" +
+                    "    SELECT film_id, COUNT(user_id) AS likes_count " +
+                    "    FROM likes " +
+                    "    GROUP BY film_id" +
+                    ") l ON f.id = l.film_id " +
+                    "WHERE fd.director_id = ? " +
                     "ORDER BY COALESCE(l.likes_count, 0) DESC";
 
     private static final String FIND_ALL_FILMS_BY_YEARS =
