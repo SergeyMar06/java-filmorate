@@ -11,8 +11,8 @@ import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -66,7 +66,7 @@ class UserRepositoryTest {
 
         userRepository.addFriend(user1.getId(), user2.getId());
 
-        List<User> friends = userRepository.getFriendsToUser(user1.getId());
+        Set<User> friends = userRepository.getFriendsToUser(user1.getId());
         assertThat(friends)
                 .extracting(User::getId)
                 .contains(user2.getId());
@@ -88,7 +88,7 @@ class UserRepositoryTest {
         userRepository.addFriend(user1.getId(), common.getId());
         userRepository.addFriend(user2.getId(), common.getId());
 
-        List<User> commonFriends =
+        Set<User> commonFriends =
                 userRepository.getFriendsCommonOtherFriend(user1.getId(), user2.getId());
 
         assertThat(commonFriends)
