@@ -90,7 +90,7 @@ public class FilmService {
         return filmRepository.findMostLikedFilms(count);
     }
 
-    public List<Film> findAllFilmByDirector(Integer directorId, String sortBy) {
+    public List<Film> findAllFilmByDirector(Long directorId, String sortBy) {
         if ("likes".equals(sortBy)) {
             return filmRepository.findFilmsByDirectorSortedByLikes(directorId);
         } else if ("year".equals(sortBy)) {
