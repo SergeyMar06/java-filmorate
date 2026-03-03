@@ -35,9 +35,9 @@ public class FilmService {
         if (film.getName() == null || film.getName().isBlank()) {
             throw new BadRequestException("Название фильма не может быть пустым");
         }
-//        if (film.getDescription() == null || film.getDescription().length() > 200) {
-//            throw new BadRequestException("Описание слишком длинное");
-//        }
+        if (film.getDescription() == null || film.getDescription().length() > 200) {
+            throw new BadRequestException("Описание слишком длинное");
+        }
         if (film.getReleaseDate() == null || film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
             throw new BadRequestException("Неверная дата релиза");
         }
@@ -90,27 +90,6 @@ public class FilmService {
         return filmRepository.findMostLikedFilms(count);
     }
 
-    public List<Film> findAllFilmByDirector(Long directorId, String sortBy) {
-        if ("likes".equals(sortBy)) {
-            return filmRepository.findFilmsByDirectorSortedByLikes(directorId);
-        } else if ("year".equals(sortBy)) {
-            return filmRepository.findFilmsByDirectorSortedByYear(directorId);
-        } else {
-            throw new IllegalArgumentException("Unknown sortBy value: " + sortBy);
-        }
     public List<Film> getCommonSortedFilms(Integer userId, Integer friendId) {
-        return filmRepository.getCommonSortedFilms(userId, friendId);
+        return filmRepository.getCommonSortedFilms(userId, friendId); }
     }
-   public List<Film> getPopular(Integer count, Long genreId, Integer year) {
-        if (count == null) {
-            count = 10;
-        }
-
-        if (genreId != null) {
-            genreRepository.findById(genreId)
-                    .orElseThrow(() -> new NotFoundException("Жанр с id = " + genreId + " не найден"));
-        }
-
-        return filmRepository.findMostPopularsByGenreAndYear(count, genreId, year);
-   }
-}
