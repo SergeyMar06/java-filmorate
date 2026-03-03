@@ -268,7 +268,6 @@ public class FilmRepository extends BaseRepository<Film> {
             );
         }
     }
-
     public List<Film> findMostPopularsByGenreAndYear(Integer count, Long genreId, Integer year) {
         List<Film> films;
 
