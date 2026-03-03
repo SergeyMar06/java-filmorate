@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,11 +24,6 @@ public class FilmController {
 
     public FilmController(FilmService filmService) {
         this.filmService = filmService;
-    }
-
-    @DeleteMapping("/{filmId}")
-    public void deleteFilm(@PathVariable int filmId) {
-        filmService.removeFilm(filmId);
     }
 
     @GetMapping
@@ -73,7 +66,7 @@ public class FilmController {
 
     @GetMapping("/common")
     public List<Film> getCommonSortedFilms(@RequestParam("userId") Integer userId,
-                                           @RequestParam("friendId") Integer friendId) {
+            @RequestParam("friendId") Integer friendId) {
         return filmService.getCommonSortedFilms(userId, friendId);
     }
 

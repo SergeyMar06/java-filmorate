@@ -20,10 +20,6 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void removeUser(int id) {
-        userRepository.removeUserById(id);
-    }
-
     public Collection<User> findAll() {
         return userRepository.findAll();
     }
