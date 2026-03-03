@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.dal;
 
+import java.util.ArrayList;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
