@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GenreService {
@@ -22,10 +21,5 @@ public class GenreService {
 
     public Genre findById(long id) {
         return genreRepository.findById(id).orElseThrow(() -> new NotFoundException("Жанр не найден"));
-
-    }
-
-    public Optional<Genre> findByIdOptional(long id) {
-        return genreRepository.findById(id);
     }
 }
