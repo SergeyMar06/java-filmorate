@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import java.util.Collection;
+import java.util.Map;
 
 @Slf4j
 @RestController
