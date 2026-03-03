@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.dal;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -107,9 +106,7 @@ public class FilmRepository extends BaseRepository<Film> {
 
     public Optional<Film> findById(long filmId) {
         Optional<Film> filmOpt = findOne(FIND_BY_ID_QUERY, filmId);
-        if (filmOpt.isEmpty()) {
-            throw new NotFoundException("Фильм с таким id = " + filmId + " не найден");
-        }
+
         filmOpt.ifPresent(film -> {
             film.setGenres(getGenresByFilmId(film.getId()));
             if (film.getMpa() != null) {

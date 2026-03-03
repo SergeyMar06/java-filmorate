@@ -4,7 +4,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.InternalServerException;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -47,6 +46,9 @@ public class UserRepository extends BaseRepository<User> {
 
     public void removeUserById(int id) {
         boolean deleted = delete(DELETE_USER_QUERY, id);
+        if (!deleted) {
+            throw new InternalServerException("Не удалось удалить пользователя");
+        }
     }
 
     public List<User> findAll() {
@@ -54,11 +56,7 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public Optional<User> findById(Integer userId) {
-        Optional<User> optUser = findOne(FIND_BY_ID_QUERY, userId);
-        if (optUser.isEmpty()) {
-            throw new NotFoundException("User с таким id = " + userId + " не найден");
-        }
-        return optUser;
+        return findOne(FIND_BY_ID_QUERY, userId);
     }
 
     public User save(User user) {
