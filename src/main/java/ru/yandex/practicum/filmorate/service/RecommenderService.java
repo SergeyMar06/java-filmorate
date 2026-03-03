@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
@@ -14,11 +12,14 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class RecommenderService {
+
     private final JdbcTemplate jdbc;
+
+    public RecommenderService(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
 
     public Collection<Film> getRecommendedMoviesForUser(Integer targetUserId) throws SQLException {
         // Получаем пары пользователей с общими интересами

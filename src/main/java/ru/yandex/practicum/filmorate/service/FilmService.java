@@ -5,28 +5,33 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.dal.*;
+import ru.yandex.practicum.filmorate.dal.DirectorRepository;
+import ru.yandex.practicum.filmorate.dal.FilmRepository;
+import ru.yandex.practicum.filmorate.dal.GenreRepository;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
 import ru.yandex.practicum.filmorate.exception.BadRequestException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Event;
-import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Operation;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class FilmService {
 
-    private final FilmRepository filmRepository;
-    private final UserRepository userRepository;
-    private final DirectorRepository directorRepository;
-    private final MpaService mpaService;
-    private final GenreRepository genreRepository;
-    private final EventRepository eventRepository;
+    private FilmRepository filmRepository;
+    private UserRepository userRepository;
+    private DirectorRepository directorRepository;
+    private MpaService mpaService;
+    private GenreRepository genreRepository;
+
+    public FilmService(FilmRepository filmRepository, MpaService mpaService,
+                       GenreRepository genreRepository, UserRepository userRepository,
+                       DirectorRepository directorRepository) {
+        this.filmRepository = filmRepository;
+        this.mpaService = mpaService;
+        this.genreRepository = genreRepository;
+        this.userRepository = userRepository;
+        this.directorRepository = directorRepository;
+    }
 
     public void removeFilm(int id) {
         filmRepository.removeFilmById(id);
@@ -94,12 +99,6 @@ public class FilmService {
         }
 
         filmRepository.likeFilm(filmId, userId);
-        Event event = new Event(); // добавление в ленту
-        event.setEventType(EventType.LIKE.toString());
-        event.setUserId(userId); // юзер добавил лайк фильму
-        event.setEntityId(filmId);
-        event.setOperation(Operation.ADD.toString());
-        eventRepository.save(event); // добавление в ленту
     }
 
     public void removeLikeTheMovie(Integer filmId, Integer userId) {
@@ -112,12 +111,6 @@ public class FilmService {
         }
 
         filmRepository.removeLike(filmId, userId);
-        Event event = new Event(); // добавление в ленту
-        event.setEventType(EventType.LIKE.toString());
-        event.setUserId(userId); // юзер удалил лайк фильму
-        event.setEntityId(filmId);
-        event.setOperation(Operation.REMOVE.toString());
-        eventRepository.save(event); // добавление в ленту
     }
 
     public List<Film> getFilmWithTheMostLikes(Integer count) {
