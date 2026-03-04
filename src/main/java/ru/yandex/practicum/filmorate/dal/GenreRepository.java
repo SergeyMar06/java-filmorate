@@ -3,9 +3,10 @@ package ru.yandex.practicum.filmorate.dal;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,18 +34,35 @@ public class GenreRepository extends BaseRepository<Genre> {
         return findOne(FIND_BY_ID_QUERY, genreId);
     }
 
-    public void addGenre(Film film) {
-        List<Object[]> batchArgs = film.getGenres()
+    public void updateFilmGenres(Integer filmId, Collection<Genre> genres) {
+
+        List<Object[]> batchArgs = genres
                 .stream()
-                .map(genre -> new Object[]{film.getId(), genre.getId()})
+                .map(genre -> new Object[]{filmId, genre.getId()})
                 .toList();
 
         jdbc.batchUpdate(INSERT_FILM_GENRE, batchArgs);
     }
 
-    public void updateGenre(Film film) {
-        jdbc.update(DELETE_FILM_GENRES, film.getId());
+    public void deleteGenresFromFilm(Integer filmId) {
+        jdbc.update(DELETE_FILM_GENRES, filmId);
+    }
 
-        addGenre(film);
+    public List<Genre> getGenresByFilmId(Integer filmId) {
+        String sql = """
+                SELECT g.id, g.name
+                FROM genres g
+                JOIN film_genre fg ON g.id = fg.genre_id
+                WHERE fg.film_id = ?
+                ORDER BY g.id""";
+
+        List<Genre> genres = jdbc.query(sql, (rs, rowNum) -> {
+            Genre genre = new Genre();
+            genre.setId(rs.getLong("id"));
+            genre.setName(rs.getString("name"));
+            return genre;
+        }, filmId);
+
+        return new ArrayList<>(genres);
     }
 }
