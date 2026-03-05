@@ -37,7 +37,7 @@ public class ReviewRepository extends ru.yandex.practicum.filmorate.dal.BaseRepo
         }
     }
 
-    public List<Review> findAllReviews(int count) { // ++
+    public List<Review> findAllReviews(int count) {
         return findMany(FIND_ALL_QUERY, count);
     }
 
@@ -46,7 +46,8 @@ public class ReviewRepository extends ru.yandex.practicum.filmorate.dal.BaseRepo
     }
 
     public void update(Review review) {
-        log.info(review.toString() + "   объект передается в репозиторий");
+        log.info("{} объект передается в репозиторий", review);
+
         update(
                 UPDATE_REVIEW_BY_ID_QUERY,
                 review.getContent(),

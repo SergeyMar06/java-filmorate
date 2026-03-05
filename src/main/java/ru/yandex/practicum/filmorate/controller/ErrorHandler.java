@@ -50,12 +50,16 @@ public class ErrorHandler {
         logInfo(e);
         String message = e.getMessage();
         String errorMessage = "Похожий объект уже существует";
-        log.error("H");
-        if (message.contains("genre")) {
-            errorMessage = "Жанр не найден";
-        } else if (message.contains("mpa")) {
-            errorMessage = "Mpa не найден";
+
+        if (message != null) {
+            if (message.contains("genre")) {
+                errorMessage = "Жанр не найден";
+            } else if (message.contains("mpa")) {
+                errorMessage = "MPA не найден";
+            }
         }
+
+        log.error("Ошибка целостности данных", e);
 
         return Map.of(
                 "error", "Ошибка",
@@ -97,6 +101,6 @@ public class ErrorHandler {
     }
 
     private void logInfo(Exception e) {
-        log.debug("Handled {}", e.getClass(), e);
+        log.debug("Handled exception {}", e.getClass().getSimpleName());
     }
 }
