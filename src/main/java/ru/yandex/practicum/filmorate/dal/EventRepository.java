@@ -40,6 +40,8 @@ public class EventRepository extends BaseRepository<Event> {
     }
 
     public Event save(Event event) {
+        log.info("Event in repository = {}", event);
+
         Integer eventId = insert(
                 INSERT_QUERY,
                 event.getUserId(),
@@ -49,7 +51,7 @@ public class EventRepository extends BaseRepository<Event> {
 
         );
         event.setEventId(eventId);
-        log.info("Event in repository =" + event);
+
         return event;
     }
 }

@@ -39,8 +39,8 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public Optional<User> findById(Integer id) {
-        return userRepository.findById(id);
+    public User findById(Integer id) {
+        return userRepository.findById(id).orElseThrow(() -> new NotFoundException("User с id = " + id + " не найден"));
     }
 
     public User create(User user) {

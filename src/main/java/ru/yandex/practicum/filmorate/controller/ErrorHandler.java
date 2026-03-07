@@ -45,26 +45,34 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.CONFLICT)
     public Map<String, String> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
         logInfo(e);
-        String message = e.getMessage();
-        String errorMessage = "Похожий объект уже существует";
-
-        if (message != null) {
-            if (message.contains("genre")) {
-                errorMessage = "Жанр не найден";
-            } else if (message.contains("mpa")) {
-                errorMessage = "MPA не найден";
-            }
-        }
 
         log.error("Ошибка целостности данных", e);
 
         return Map.of(
                 "error", "Ошибка",
-                "message", errorMessage
+                "message", resolveErrorMessage(e.getMessage())
         );
+    }
+
+    private String resolveErrorMessage(String message) {
+        String defaultMessage = "Похожий объект уже существует";
+
+        if (message == null) {
+            return defaultMessage;
+        }
+
+        if (message.contains("genre")) {
+            return "Genre не найден";
+        }
+
+        if (message.contains("mpa")) {
+            return "Mpa не найден";
+        }
+
+        return defaultMessage;
     }
 
     // 404 — объект не найден

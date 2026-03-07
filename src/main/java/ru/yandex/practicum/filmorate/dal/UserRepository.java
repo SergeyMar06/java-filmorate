@@ -57,11 +57,7 @@ public class UserRepository extends BaseRepository<User> {
     }
 
     public Optional<User> findById(Integer userId) {
-        Optional<User> optUser = findOne(FIND_BY_ID_QUERY, userId);
-        if (optUser.isEmpty()) {
-            throw new NotFoundException("User с таким id = " + userId + " не найден");
-        }
-        return optUser;
+        return findOne(FIND_BY_ID_QUERY, userId);
     }
 
     public User save(User user) {
