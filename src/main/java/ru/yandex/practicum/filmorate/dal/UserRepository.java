@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public class UserRepository extends BaseRepository<User> {
@@ -30,16 +29,26 @@ public class UserRepository extends BaseRepository<User> {
     private static final String FIND_FRIENDS =
             "SELECT u.* FROM users u " +
                     "JOIN friendship f ON u.id = f.friend_id " +
-                    "WHERE f.user_id = ?";
+                    "WHERE f.user_id = ?" +
+                    "ORDER BY u.id;";
 
     private static final String FIND_COMMON_FRIENDS =
             "SELECT u.* FROM users u " +
                     "JOIN friendship f1 ON u.id = f1.friend_id " +
                     "JOIN friendship f2 ON u.id = f2.friend_id " +
-                    "WHERE f1.user_id = ? AND f2.user_id = ?";
+                    "WHERE f1.user_id = ? AND f2.user_id = ?" +
+                    "ORDER BY u.id;";
+
+    private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE id = ?";
+
+    private static final String EXISTS_BY_ID = "SELECT EXISTS(SELECT 1 FROM users WHERE id = ?)";
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
+    }
+
+    public void removeUserById(int id) {
+        boolean deleted = delete(DELETE_USER_QUERY, id);
     }
 
     public List<User> findAll() {
@@ -82,28 +91,31 @@ public class UserRepository extends BaseRepository<User> {
         jdbc.update(INSERT_FRIEND, id, friendId);
     }
 
-    public void removeFromFriends(Integer id, Integer friendId) {
+    public List<User> removeFromFriends(Integer id, Integer friendId) {
         jdbc.update(DELETE_FRIEND, id, friendId);
+
+        return getFriendsToUser(id);
     }
 
-    public Set<User> getFriendsToUser(Integer id) {
-        List<User> friends = jdbc.query(
+    public List<User> getFriendsToUser(Integer id) {
+        return jdbc.query(
                 FIND_FRIENDS,
                 mapper,
                 id
         );
-
-        return Set.copyOf(friends);
     }
 
-    public Set<User> getFriendsCommonOtherFriend(Integer id, Integer friendId) {
-        List<User> commonFriends = jdbc.query(
+    public List<User> getFriendsCommonOtherFriend(Integer id, Integer friendId) {
+        return jdbc.query(
                 FIND_COMMON_FRIENDS,
                 mapper,
                 id,
                 friendId
         );
 
-        return Set.copyOf(commonFriends);
+    }
+
+    public boolean existsById(Integer id) {
+        return jdbc.queryForObject(EXISTS_BY_ID, Boolean.class, id);
     }
 }
